@@ -30,6 +30,7 @@
       --primary: #ff2a85;
       --secondary: #00e5ff;
       --accent: #7c4dff;
+      --purple-accent: #7c3aed;
       --text: #ffffff;
       --muted: #94a3b8;
       --success: #10b981;
@@ -71,7 +72,7 @@
       top: 22px;
       left: 50%;
       transform: translateX(-50%) translateY(-25px) scale(0.92);
-      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      background: linear-gradient(135deg, var(--purple-accent), var(--accent));
       color: #ffffff;
       padding: 12px 22px;
       border-radius: 999px;
@@ -94,7 +95,7 @@
       transform: translateX(-50%) translateY(0) scale(1);
     }
 
-    /* FONDO MULTIMEDIA CON VIDEO Y MÚSICA */
+    /* FONDO MULTIMEDIA CON VIDEO, IMAGEN Y MÚSICA */
     #bg-media-container {
       position: fixed;
       inset: 0;
@@ -495,6 +496,55 @@
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
 
+    /* PALETA DE COLORES EN ADMIN */
+    .palette-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .color-picker-item {
+      background: rgba(8, 11, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .color-picker-item input[type="color"] {
+      width: 34px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    .swatches-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .swatch-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
     /* TARJETAS DE FORMULARIOS Y MODALES */
     .panel-card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
     .ref-box { background: rgba(0, 229, 255, 0.1); border: 1px dashed var(--secondary); border-radius: 12px; padding: 12px; text-align: center; margin: 10px 0; }
@@ -533,6 +583,23 @@
       background: #101626; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 18px;
       width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative;
     }
+    .capture-thumb {
+      max-height: 85px;
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 5px 0;
+      cursor: zoom-in;
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      display: block;
+    }
+    .capture-full-img {
+      width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.45);
+      display: block;
+    }
     .copy-row {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px 12px; border-radius: 10px; margin-bottom: 8px;
@@ -553,9 +620,35 @@
     .music-title { font-size: 11px; font-weight: 700; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .video-audio-btn {
       position: fixed; left: 12px; bottom: 62px; z-index: 150;
-      background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(255, 42, 133, 0.9));
+      background: linear-gradient(135deg, var(--purple-accent), var(--accent));
       border: 1px solid rgba(255, 255, 255, 0.3); color: #fff; padding: 7px 13px; border-radius: 999px;
       font-size: 11.5px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.5); display: none; align-items: center; gap: 6px;
+    }
+
+    /* BURBUJA FLOTANTE DE WHATSAPP */
+    .wa-float-bubble {
+      position: fixed;
+      right: 14px;
+      bottom: 16px;
+      z-index: 350;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      padding: 10px 15px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 900;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 8px 22px rgba(37, 211, 102, 0.55);
+      cursor: pointer;
+    }
+    .wa-float-bubble svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -664,7 +757,7 @@
         <div class="field-group">
           <label>Captura de Transferencia</label>
           <label for="rec-capture-input" class="upload-label">📸 Subir captura<img id="rec-capture-preview" class="upload-preview" /></label>
-          <input type="file" id="rec-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rec-capture-preview', 'recCaptureData', false)" />
+          <input type="file" id="rec-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rec-capture-preview', 'recCaptureData', false, 960, 0.92)" />
         </div>
         <button class="btn-main" onclick="submitRechargeRequest()">⚡ Enviar Recarga</button>
       </div>
@@ -701,7 +794,7 @@
         <div class="field-group">
           <label>Captura</label>
           <label for="rep-capture-input" class="upload-label">📸 Subir captura<img id="rep-capture-preview" class="upload-preview" /></label>
-          <input type="file" id="rep-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rep-capture-preview', 'repCaptureData', false)" />
+          <input type="file" id="rep-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rep-capture-preview', 'repCaptureData', false, 960, 0.92)" />
         </div>
         <button class="btn-main" onclick="submitIssueReport()">📨 Enviar Reporte</button>
       </div>
@@ -727,7 +820,7 @@
           <button class="nav-tab" onclick="switchAdminTab('adm-productos', this)">📦 Productos</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-reportes', this)">🛠️ Reportes</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-categorias', this)">📂 Categorías</button>
-          <button class="nav-tab" onclick="switchAdminTab('adm-diseno', this)">🎨 Diseño, Video & Bot WA</button>
+          <button class="nav-tab" onclick="switchAdminTab('adm-diseno', this)">🎨 Diseño, Fondo & Bot WA</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-musica', this)">🎵 Música</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-export', this)">💾 Respaldo</button>
         </div>
@@ -811,6 +904,48 @@
         </div>
 
         <div id="adm-diseno" class="adm-tab" style="display:none;">
+          <div class="palette-card">
+            <label style="color:var(--secondary);font-size:13px;font-weight:800;display:block;">🎨 Paleta de Colores (Incluye tonos morados)</label>
+            <div class="palette-grid">
+              <div class="color-picker-item">
+                <span>Morado Avisos</span>
+                <input type="color" id="cfg-color-purple" value="#7c3aed" oninput="previewColorsLive()" />
+              </div>
+              <div class="color-picker-item">
+                <span>Acento Morado</span>
+                <input type="color" id="cfg-color-accent" value="#7c4dff" oninput="previewColorsLive()" />
+              </div>
+              <div class="color-picker-item">
+                <span>Color Principal</span>
+                <input type="color" id="cfg-color-primary" value="#ff2a85" oninput="previewColorsLive()" />
+              </div>
+              <div class="color-picker-item">
+                <span>Color Secundario</span>
+                <input type="color" id="cfg-color-secondary" value="#00e5ff" oninput="previewColorsLive()" />
+              </div>
+              <div class="color-picker-item" style="grid-column: span 2;">
+                <span>Color de Fondo</span>
+                <input type="color" id="cfg-color-bg" value="#080b14" oninput="previewColorsLive()" />
+              </div>
+            </div>
+            <div class="swatches-row" title="Tonos rápidos morados y de tienda">
+              <button type="button" class="swatch-btn" style="background:#7c3aed;" onclick="applyPresetPurple('#7c3aed', '#8b5cf6')" title="Morado Intenso"></button>
+              <button type="button" class="swatch-btn" style="background:#9333ea;" onclick="applyPresetPurple('#9333ea', '#a855f7')" title="Púrpura Brillante"></button>
+              <button type="button" class="swatch-btn" style="background:#6d28d9;" onclick="applyPresetPurple('#6d28d9', '#7c4dff')" title="Violeta Profundo"></button>
+              <button type="button" class="swatch-btn" style="background:#a21caf;" onclick="applyPresetPurple('#a21caf', '#c026d3')" title="Morado Magenta"></button>
+              <button type="button" class="swatch-btn" style="background:#4f46e5;" onclick="applyPresetPurple('#4f46e5', '#6366f1')" title="Índigo Morado"></button>
+              <button type="button" class="swatch-btn" style="background:#00e5ff;" onclick="applyPresetPurple('#0891b2', '#00e5ff')" title="Cian"></button>
+            </div>
+          </div>
+
+          <div class="field-group" style="background:rgba(0,229,255,0.08);border:1.5px solid rgba(0,229,255,0.35);padding:12px;border-radius:14px;">
+            <label style="color:var(--secondary);font-size:13px;">🖼️ SUBIR IMAGEN DE FONDO DE PANTALLA (Galería)</label>
+            <label for="adm-bg-img-file-input" class="upload-label">🖼️ Elegir imagen de fondo</label>
+            <input type="file" id="adm-bg-img-file-input" accept="image/*" style="display:none" onchange="handleBgImageGalleryUpload(event)" />
+            <img id="adm-bg-img-preview" class="upload-preview" />
+            <div class="field-group" style="margin-top:10px;margin-bottom:0;"><label>O link de imagen de fondo</label><input type="text" id="cfg-bg-img-url" placeholder="https://...jpg o .png" /></div>
+          </div>
+
           <div class="field-group" style="background:rgba(124,58,237,0.14);border:1.5px solid rgba(168,85,247,0.5);padding:12px;border-radius:14px;">
             <label style="color:#e9d5ff;font-size:13px;">🎬 SUBIR VIDEO DE FONDO CON MÚSICA (Galería)</label>
             <label for="adm-bg-vid-file-input" class="upload-label" style="border-color:#c084fc;color:#e9d5ff;background:rgba(124,58,237,0.2);">🎬 Elegir video .mp4 con música</label>
@@ -818,13 +953,14 @@
             <div id="bg-video-upload-status" style="font-size:11.5px;color:#34d399;margin-top:6px;font-weight:700;"></div>
             <div class="field-group" style="margin-top:10px;margin-bottom:0;"><label>O link .mp4</label><input type="text" id="cfg-bg-vid-url" placeholder="https://...mp4" /></div>
           </div>
+
           <div class="field-group"><label>Tienda</label><input type="text" id="cfg-store-name" /></div>
           <div class="field-group"><label>Eslogan</label><input type="text" id="cfg-store-slogan" /></div>
           <div class="field-group">
             <label>Datos Bancarios / SPEI para Recargas</label>
             <textarea id="cfg-bank-info" rows="3" placeholder="Ej. Banco: BBVA / SPEI&#10;CLABE: 012345678901234567"></textarea>
           </div>
-          <div class="field-group"><label>WhatsApp Admin</label><input type="text" id="cfg-wa-number" placeholder="TU_NUMERO_WHATSAPP" /></div>
+          <div class="field-group"><label>WhatsApp Admin (Burbuja y avisos)</label><input type="text" id="cfg-wa-number" placeholder="TU_NUMERO_WHATSAPP" /></div>
           <div class="field-group"><label>Telegram Bot Token</label><input type="text" id="cfg-tg-token" placeholder="TU_TELEGRAM_BOT_TOKEN" /></div>
           <div class="field-group"><label>Telegram Chat ID</label><input type="text" id="cfg-tg-chat-id" placeholder="TU_TELEGRAM_CHAT_ID" /></div>
           <div class="field-group"><label>UltraMsg Instance ID</label><input type="text" id="cfg-wa-api-instance" placeholder="TU_ULTRAMSG_INSTANCE_ID" /></div>
@@ -852,7 +988,29 @@
     <audio id="audio-player" onended="nextSong()"></audio>
   </div>
 
+  <!-- BURBUJA FLOTANTE CON LOGO DE WHATSAPP -->
+  <a id="wa-float-bubble" class="wa-float-bubble" href="#" target="_blank" rel="noopener noreferrer" onclick="handleWaBubbleClick(event)" title="Ir a WhatsApp" data-app="store">
+    <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+      <path d="M16.004 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.256.59 4.46 1.71 6.404L3.1 29.02l6.786-1.78a12.74 12.74 0 0 0 6.118 1.56h.006c7.058 0 12.798-5.74 12.798-12.8 0-3.42-1.332-6.634-3.75-9.052A12.715 12.715 0 0 0 16.004 3.2zm0 23.434h-.004a10.6 10.6 0 0 1-5.404-1.48l-.388-.23-4.026 1.056 1.074-3.926-.252-.402a10.566 10.566 0 0 1-1.622-5.652c0-5.858 4.766-10.624 10.626-10.624 2.838 0 5.506 1.106 7.512 3.114a10.556 10.556 0 0 1 3.11 7.514c0 5.86-4.766 10.63-10.626 10.63zm5.828-7.958c-.32-.16-1.89-.932-2.182-1.038-.292-.106-.506-.16-.718.16-.214.32-.826 1.038-1.012 1.252-.186.212-.372.24-.692.08-.32-.16-1.35-.498-2.572-1.588-.95-.848-1.592-1.896-1.778-2.216-.186-.32-.02-.492.14-.652.144-.144.32-.372.48-.558.16-.186.212-.32.32-.532.106-.214.054-.4-.026-.56-.08-.16-.718-1.732-.984-2.372-.26-.622-.524-.538-.718-.548l-.612-.01c-.214 0-.56.08-.852.4-.294.32-1.118 1.092-1.118 2.664 0 1.572 1.144 3.09 1.304 3.304.16.212 2.252 3.438 5.456 4.822.762.33 1.356.526 1.82.674.766.244 1.462.21 2.012.128.614-.092 1.89-.772 2.156-1.518.266-.746.266-1.386.186-1.518-.08-.134-.292-.214-.612-.374z"/>
+    </svg>
+    <span>WhatsApp</span>
+  </a>
+
   <!-- MODALES -->
+  <div class="modal-backdrop" id="modal-view-capture" data-app="store">
+    <div class="modal-box" style="max-width:640px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;">
+        <h3 id="capture-modal-title">🖼️ Comprobante</h3>
+        <button class="btn-outline" style="padding:4px 9px;" onclick="closeModal('modal-view-capture')">✕</button>
+      </div>
+      <img id="capture-modal-img" class="capture-full-img" src="" alt="Comprobante ampliado" />
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <a id="capture-modal-open-tab" href="#" target="_blank" rel="noopener noreferrer" class="btn-outline" style="flex:1;text-decoration:none;">🔍 Abrir imagen</a>
+        <button class="btn-main" style="flex:1;" onclick="closeModal('modal-view-capture')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="modal-client-auth" data-app="store">
     <div class="modal-box" style="max-width:410px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -954,6 +1112,31 @@
     }
     window.alert = function(msg) { showPurpleToast(msg); };
 
+    function openCaptureViewer(src, titleText) {
+      if (!src) return;
+      const imgEl = document.getElementById("capture-modal-img");
+      const titleEl = document.getElementById("capture-modal-title");
+      const openTabEl = document.getElementById("capture-modal-open-tab");
+      if (imgEl) imgEl.src = src;
+      if (titleEl) titleEl.innerText = titleText || "🖼️ Comprobante";
+      if (openTabEl) openTabEl.href = src;
+      openModal("modal-view-capture");
+    }
+
+    function openRechargeCaptureById(reqId) {
+      const req = (STATE.rechargeRequests || []).find(x => x.id === reqId);
+      if (req && req.capture) {
+        openCaptureViewer(req.capture, `💳 Comprobante • ${req.clientName} ($${req.amount})`);
+      }
+    }
+
+    function openReportCaptureById(repId) {
+      const rep = (STATE.reports || []).find(x => x.id === repId);
+      if (rep && rep.capture) {
+        openCaptureViewer(rep.capture, `⚠️ Captura de falla • ${rep.platform}`);
+      }
+    }
+
     function copyText(txt) {
       if (!txt) return;
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -984,6 +1167,30 @@
     let loadedVideoId = "";
     let wantVideoSound = true;
     let isSavingStock = false;
+
+    function handleWaBubbleClick(ev) {
+      const digits = normalizePhoneForWA(STATE.waNumber || "");
+      if (!digits || digits === "TU_NUMERO_WHATSAPP") {
+        ev.preventDefault();
+        showPurpleToast("⚠️ Configura el número de WhatsApp en Diseño");
+        return;
+      }
+      document.getElementById("wa-float-bubble").href = `https://wa.me/${digits}`;
+    }
+
+    function handleBgImageGalleryUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      compressImageFile(file, 1080, 0.85, true, function(dataUrl) {
+        STATE.background.type = "image";
+        STATE.background.dataUrl = dataUrl;
+        STATE.background.videoId = "";
+        const prev = document.getElementById("adm-bg-img-preview");
+        if (prev) { prev.src = dataUrl; prev.style.display = "block"; }
+        saveState();
+        showPurpleToast("✨ Imagen de fondo guardada");
+      });
+    }
 
     async function sendTelegramNotification(text) {
       const token = (STATE.tgToken || "").trim();
@@ -1167,7 +1374,7 @@
       defaultCodeUrl: "TU_URL_DE_CODIGOS",
       defaultPostBuyMsg: "📌 Garantía: 25 días base; si tu cuenta es de más de 1 mes, la garantía aumenta según el tiempo de la cuenta.",
       bankInfo: "🏦 Banco: TU_BANCO\n💳 Cuenta / CLABE: TU_CLABE_SPEI",
-      colors: { primary: "#ff2a85", secondary: "#00e5ff", bg: "#080b14", overlayOpacity: 0.55 },
+      colors: { primary: "#ff2a85", secondary: "#00e5ff", accent: "#7c4dff", purpleAccent: "#7c3aed", bg: "#080b14", overlayOpacity: 0.55 },
       background: { type: "particles", dataUrl: "", videoId: "" },
       deliveredCount: 0,
       categories: [
@@ -1400,10 +1607,10 @@
       reader.readAsDataURL(file);
     }
 
-    function previewUpload(event, previewImgId, globalVarName, keepTransparency = true) {
+    function previewUpload(event, previewImgId, globalVarName, keepTransparency = true, maxW = 600, quality = 0.85) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-      compressImageFile(file, 600, 0.85, keepTransparency, function(dataUrl) {
+      compressImageFile(file, maxW, quality, keepTransparency, function(dataUrl) {
         window[globalVarName] = dataUrl;
         const previewEl = document.getElementById(previewImgId);
         if (previewEl) { previewEl.src = dataUrl; previewEl.style.display = "block"; }
@@ -1418,12 +1625,47 @@
       compressImageFile(file, 360, 0.85, true, function(dataUrl) { STATE.profilePic = dataUrl; saveState(); showPurpleToast("✨ Se guardó con éxito"); });
     }
 
+    function previewColorsLive() {
+      const r = document.documentElement;
+      const pEl = document.getElementById("cfg-color-primary");
+      const sEl = document.getElementById("cfg-color-secondary");
+      const aEl = document.getElementById("cfg-color-accent");
+      const purEl = document.getElementById("cfg-color-purple");
+      const bgEl = document.getElementById("cfg-color-bg");
+      if (pEl) r.style.setProperty("--primary", pEl.value);
+      if (sEl) r.style.setProperty("--secondary", sEl.value);
+      if (aEl) r.style.setProperty("--accent", aEl.value);
+      if (purEl) r.style.setProperty("--purple-accent", purEl.value);
+      if (bgEl) r.style.setProperty("--bg-color", bgEl.value);
+    }
+
+    function applyPresetPurple(purpleHex, accentHex) {
+      const purEl = document.getElementById("cfg-color-purple");
+      const accEl = document.getElementById("cfg-color-accent");
+      if (purEl) purEl.value = purpleHex;
+      if (accEl) accEl.value = accentHex;
+      previewColorsLive();
+      showPurpleToast("🎨 Tono aplicado");
+    }
+
     function applyThemeAndBackground() {
       const r = document.documentElement;
-      r.style.setProperty("--primary", STATE.colors.primary);
-      r.style.setProperty("--secondary", STATE.colors.secondary);
-      r.style.setProperty("--bg-color", STATE.colors.bg);
+      r.style.setProperty("--primary", STATE.colors.primary || "#ff2a85");
+      r.style.setProperty("--secondary", STATE.colors.secondary || "#00e5ff");
+      r.style.setProperty("--accent", STATE.colors.accent || "#7c4dff");
+      r.style.setProperty("--purple-accent", STATE.colors.purpleAccent || "#7c3aed");
+      r.style.setProperty("--bg-color", STATE.colors.bg || "#080b14");
       r.style.setProperty("--overlay-opacity", STATE.colors.overlayOpacity ?? 0.55);
+
+      const waBubble = document.getElementById("wa-float-bubble");
+      if (waBubble) {
+        const digits = normalizePhoneForWA(STATE.waNumber || "");
+        if (digits && digits !== "TU_NUMERO_WHATSAPP") {
+          waBubble.href = `https://wa.me/${digits}`;
+        } else {
+          waBubble.href = "#";
+        }
+      }
 
       const bgContainer = document.getElementById("bg-media-container");
       const bgVideo = document.getElementById("bg-video");
@@ -1772,6 +2014,8 @@
       sendTelegramNotification(`💳 *¡NUEVA RECARGA!*\n👤 ${me.name}\n💰 $${amount}\nRef: ${req.refCode}`);
 
       window.recCaptureData = ""; document.getElementById("rec-amount").value = "";
+      const recPrev = document.getElementById("rec-capture-preview");
+      if (recPrev) { recPrev.src = ""; recPrev.style.display = "none"; }
       generateNewRefCode(); await saveState(); showPurpleToast("✨ Se guardó con éxito");
     }
 
@@ -1845,7 +2089,7 @@
             ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${r.repProfile}</div>` : ''}
             <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Día de compra: ${r.purchaseDate || "No especificado"} • 📅 Día de reporte: ${r.reportDate || r.date}</div>
             <div style="color:var(--muted);margin-top:4px;">${r.desc}</div>
-            ${r.capture ? `<img src="${r.capture}" style="max-height:90px;border-radius:8px;margin-top:6px;" />` : ''}
+            ${r.capture ? `<img src="${r.capture}" class="capture-thumb" onclick="openReportCaptureById('${r.id}')" title="Toca para ver de cerca" />` : ''}
             <div style="margin-top:6px;padding:8px;background:rgba(245,158,11,0.1);border-radius:8px;color:#fde68a;font-size:11.5px;">
               <b>📌 Aviso del reporte:</b> ${policyText}
             </div>
@@ -1877,6 +2121,12 @@
       document.getElementById("p-cat").innerHTML = STATE.categories.filter(c => c.id !== "all").map(c => `<option value="${c.id}">${c.name}</option>`).join("");
       document.getElementById("adm-target-client").innerHTML = Object.values(STATE.clients || {}).map(c => `<option value="${c.id}">${c.name}</option>`).join("");
 
+      document.getElementById("cfg-color-purple").value = STATE.colors.purpleAccent || "#7c3aed";
+      document.getElementById("cfg-color-accent").value = STATE.colors.accent || "#7c4dff";
+      document.getElementById("cfg-color-primary").value = STATE.colors.primary || "#ff2a85";
+      document.getElementById("cfg-color-secondary").value = STATE.colors.secondary || "#00e5ff";
+      document.getElementById("cfg-color-bg").value = STATE.colors.bg || "#080b14";
+
       document.getElementById("cfg-store-name").value = STATE.storeName || "";
       document.getElementById("cfg-store-slogan").value = STATE.storeSlogan || "";
       document.getElementById("cfg-bank-info").value = STATE.bankInfo || "";
@@ -1885,7 +2135,14 @@
       document.getElementById("cfg-tg-chat-id").value = STATE.tgChatId || "";
       document.getElementById("cfg-wa-api-instance").value = STATE.waApiInstance || "";
       document.getElementById("cfg-wa-api-token").value = STATE.waApiToken || "";
+      document.getElementById("cfg-bg-img-url").value = (STATE.background && STATE.background.type === "image" && STATE.background.dataUrl) ? STATE.background.dataUrl : "";
       document.getElementById("cfg-bg-vid-url").value = (STATE.background && STATE.background.type === "video" && STATE.background.dataUrl) ? STATE.background.dataUrl : "";
+
+      const bgImgPrev = document.getElementById("adm-bg-img-preview");
+      if (bgImgPrev && STATE.background && STATE.background.type === "image" && STATE.background.dataUrl) {
+        bgImgPrev.src = STATE.background.dataUrl;
+        bgImgPrev.style.display = "block";
+      }
 
       document.getElementById("adm-recent-sales-list").innerHTML = (STATE.salesHistory || []).length ? STATE.salesHistory.slice(0, 10).map(s => `
         <div style="background:rgba(16,185,129,0.08);padding:8px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
@@ -1897,8 +2154,11 @@
       document.getElementById("adm-recharges-list").innerHTML = STATE.rechargeRequests.map(r => `
         <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-bottom:8px;">
           <div><b>${r.clientName}</b> - $${r.amount} (${r.status})</div>
-          ${r.capture ? `<img src="${r.capture}" style="max-height:80px;margin-top:4px;" />` : ''}
-          ${r.status === 'Pendiente' ? `<button class="btn-main" style="margin-top:4px;" onclick="adminApproveRecharge('${r.id}')">Aprobar</button>` : ''}
+          ${r.capture ? `
+            <img src="${r.capture}" class="capture-thumb" onclick="openRechargeCaptureById('${r.id}')" title="Toca para ver de cerca" />
+            <button class="btn-outline" style="padding:5px 10px;font-size:11.5px;margin-top:4px;" onclick="openRechargeCaptureById('${r.id}')">🔍 Ver comprobante de cerca</button>
+          ` : ''}
+          ${r.status === 'Pendiente' ? `<button class="btn-main" style="margin-top:6px;" onclick="adminApproveRecharge('${r.id}')">Aprobar</button>` : ''}
         </div>
       `).join("");
 
@@ -1921,7 +2181,10 @@
           ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${r.repProfile}</div>` : ''}
           <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Compra: ${r.purchaseDate || "No especificado"} • 📅 Reporte: ${r.reportDate || r.date}</div>
           <div style="color:var(--muted);margin:4px 0;">${r.desc}</div>
-          ${r.capture ? `<img src="${r.capture}" style="max-height:85px;border-radius:8px;margin:4px 0;" />` : ''}
+          ${r.capture ? `
+            <img src="${r.capture}" class="capture-thumb" onclick="openReportCaptureById('${r.id}')" title="Toca para ver de cerca" />
+            <button class="btn-outline" style="padding:5px 10px;font-size:11.5px;margin-top:4px;" onclick="openReportCaptureById('${r.id}')">🔍 Ver captura de cerca</button>
+          ` : ''}
           ${r.resolution ? `<div style="color:#34d399;margin:4px 0;font-size:11.5px;"><b>Resolución:</b> ${r.resolution}</div>` : ''}
           <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
             <button class="btn-main" style="width:auto;padding:6px 10px;" onclick="openResolveReportModal('${r.id}', false)">🛠️ Resolver falla</button>
@@ -2147,6 +2410,14 @@
     }
 
     function adminSaveDesign() {
+      STATE.colors = Object.assign({}, STATE.colors, {
+        purpleAccent: document.getElementById("cfg-color-purple").value || STATE.colors.purpleAccent,
+        accent: document.getElementById("cfg-color-accent").value || STATE.colors.accent,
+        primary: document.getElementById("cfg-color-primary").value || STATE.colors.primary,
+        secondary: document.getElementById("cfg-color-secondary").value || STATE.colors.secondary,
+        bg: document.getElementById("cfg-color-bg").value || STATE.colors.bg
+      });
+
       STATE.storeName = document.getElementById("cfg-store-name").value.trim() || STATE.storeName;
       STATE.storeSlogan = document.getElementById("cfg-store-slogan").value.trim() || STATE.storeSlogan;
       STATE.bankInfo = document.getElementById("cfg-bank-info").value.trim() || STATE.bankInfo;
@@ -2155,10 +2426,16 @@
       STATE.tgChatId = document.getElementById("cfg-tg-chat-id").value.trim();
       STATE.waApiInstance = document.getElementById("cfg-wa-api-instance").value.trim();
       STATE.waApiToken = document.getElementById("cfg-wa-api-token").value.trim();
+
+      const imgUrl = document.getElementById("cfg-bg-img-url").value.trim();
       const vidUrl = document.getElementById("cfg-bg-vid-url").value.trim();
       if (vidUrl) {
         STATE.background.type = "video";
         STATE.background.dataUrl = vidUrl;
+        STATE.background.videoId = "";
+      } else if (imgUrl) {
+        STATE.background.type = "image";
+        STATE.background.dataUrl = imgUrl;
         STATE.background.videoId = "";
       }
       saveState(); showPurpleToast("✨ Diseño guardado");
