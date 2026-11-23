@@ -803,7 +803,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
           <div>
             <h2 style="font-size:18px;color:var(--warning);">👑 Panel Administración</h2>
-            <div id="firebase-status-banner" style="font-size:12px;color:#34d399;font-weight:700;">🟢 Verificando conexión...</div>
+            <div id="firebase-status-banner" style="font-size:12px;color:#34d399;font-weight:700;">🟢 Verificando Firebase...</div>
           </div>
           <div style="display:flex;gap:6px;">
             <button class="btn-outline" onclick="switchView('tienda')">🛍️ Tienda</button>
@@ -819,7 +819,7 @@
           <button class="nav-tab" onclick="switchAdminTab('adm-categorias', this)">📂 Categorías</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-diseno', this)">🎨 Diseño, Fondo & Bot WA</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-musica', this)">🎵 Música</button>
-          <button class="nav-tab" onclick="switchAdminTab('adm-export', this)">☁️ Nube / Respaldo</button>
+          <button class="nav-tab" onclick="switchAdminTab('adm-export', this)">☁️ Firebase / Respaldo</button>
         </div>
 
         <div id="adm-recargas" class="adm-tab">
@@ -979,9 +979,9 @@
 
         <div id="adm-export" class="adm-tab" style="display:none;">
           <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;line-height:1.45;">
-            Sube a la nube todo lo que ya editaste en este dispositivo para que aparezca en incógnito y a todos los clientes:
+            Sube a Firebase Realtime Database todo lo que ya editaste en este dispositivo para que aparezca en incógnito y a todos los clientes:
           </p>
-          <button class="btn-main" onclick="forcePushToCloud()">☁️ Subir mi tienda actual a la nube</button>
+          <button class="btn-main" onclick="forcePushToFirebase()">☁️ Subir mi tienda actual a Firebase</button>
           <div id="cloud-diag-box" style="margin-top:10px;font-size:11.5px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:10px;border-radius:10px;word-break:break-all;"></div>
         </div>
       </div>
@@ -1127,6 +1127,15 @@
   </div>
 
   <script data-app="store">
+    const FIREBASE_BASE_URL = "https://cocobongo-shop660-default-rtdb.firebaseio.com/";
+
+    const CLEAN_FB_BASE = FIREBASE_BASE_URL.trim().replace(/\/+$/, "");
+    const isFirebaseConfigured = CLEAN_FB_BASE.startsWith("http") && !CLEAN_FB_BASE.includes("PEGA_AQUI");
+
+    const FIREBASE_DB_URL = isFirebaseConfigured ? `${CLEAN_FB_BASE}/cocobongo_store_v1.json` : "";
+    const FIREBASE_STOCK_URL = isFirebaseConfigured ? `${CLEAN_FB_BASE}/cocobongo_stock_v1.json` : "";
+    const FIREBASE_VIDEO_URL = isFirebaseConfigured ? `${CLEAN_FB_BASE}/cocobongo_video_bg.json` : "";
+
     const REPORT_POLICY_MSG = "El reporte puede tardar de 1 a 2 días en resolverse para darle su repuesto si es posible. Si fue por incumplimiento de las normas, no se le cumplirá ni se le aplicará la garantía.";
 
     let toastTimer = null;
@@ -1196,10 +1205,8 @@
       document.body.removeChild(ta);
     }
 
-    // CONEXIÓN DIRECTA A TU CLOUDFLARE WORKER (KV)
-    const WORKER_BASE = "https://cocobongo.dessireecampos07.workers.dev";
-    const STORAGE_KEY = "COCOBONGOSTORE_CLOUD_CACHE_V1";
-    const STOCK_STORAGE_KEY = "COCOBONGOSTORE_STOCK_CACHE_V1";
+    const STORAGE_KEY = "COCOBONGOSTORE_FIREBASE_CACHE_V1";
+    const STOCK_STORAGE_KEY = "COCOBONGOSTORE_FIREBASE_STOCK_V1";
     const CLIENT_ID_KEY = "COCOBONGOSTORE_CLIENT_DEVICE_ID";
     const ADMIN_PASS = "jose660";
 
@@ -1216,86 +1223,26 @@
       const diag = document.getElementById("cloud-diag-box");
       if (detail) lastCloudError = detail;
 
+      if (!isFirebaseConfigured) {
+        if (mini) { mini.innerText = "● Falta URL Firebase"; mini.style.color = "#f59e0b"; }
+        if (banner) { banner.innerText = "⚠️ Pega tu URL de Firebase en el código HTML"; banner.style.color = "#f59e0b"; }
+        if (diag) diag.innerHTML = "⚠️ Aún no has pegado tu URL de Firebase en <b>FIREBASE_BASE_URL</b>.";
+        return;
+      }
+
       if (state === "syncing") {
         if (mini) { mini.innerText = "● Guardando..."; mini.style.color = "#f59e0b"; }
-        if (banner) { banner.innerText = "🟡 Guardando en la nube..."; banner.style.color = "#f59e0b"; }
+        if (banner) { banner.innerText = "🟡 Guardando en Firebase..."; banner.style.color = "#f59e0b"; }
       } else if (state === "error") {
-        if (mini) { mini.innerText = "● Error nube"; mini.style.color = "#ef4444"; }
-        if (banner) { banner.innerText = "🔴 Error al conectar/guardar: " + (detail || "Revisa CORS o Worker"); banner.style.color = "#ef4444"; }
+        if (mini) { mini.innerText = "● Error Firebase"; mini.style.color = "#ef4444"; }
+        if (banner) { banner.innerText = "🔴 Error Firebase: " + (detail || "Verifica reglas en modo prueba"); banner.style.color = "#ef4444"; }
       } else {
         if (mini) { mini.innerText = "● En línea 24/7"; mini.style.color = "#34d399"; }
-        if (banner) { banner.innerText = "🟢 Sincronizado con la nube"; banner.style.color = "#34d399"; }
+        if (banner) { banner.innerText = "🟢 Conectado a Firebase Realtime Database"; banner.style.color = "#34d399"; }
       }
       if (diag) {
-        diag.innerHTML = `<b>Worker:</b> ${escapeHtml(WORKER_BASE)}<br><b>Productos en memoria:</b> ${STATE.products.length} • <b>Stock en memoria:</b> ${accountsStock.length}<br><b>Último detalle:</b> ${escapeHtml(detail || lastCloudError || "OK")}`;
+        diag.innerHTML = `<b>Firebase:</b> ${escapeHtml(CLEAN_FB_BASE)}<br><b>Productos en memoria:</b> ${STATE.products.length} • <b>Stock libre:</b> ${accountsStock.filter(a => !a.used).length}<br><b>Estado:</b> ${escapeHtml(detail || lastCloudError || "OK")}`;
       }
-    }
-
-    function unwrapCloudPayload(parsed) {
-      if (!parsed || typeof parsed !== "object") return parsed;
-      if (parsed.value !== undefined) {
-        if (typeof parsed.value === "string") {
-          try { return JSON.parse(parsed.value); } catch (e) { return parsed.value; }
-        }
-        return parsed.value;
-      }
-      if (parsed.data !== undefined && parsed.ok === true) {
-        if (typeof parsed.data === "string") {
-          try { return JSON.parse(parsed.data); } catch (e) { return parsed.data; }
-        }
-        return parsed.data;
-      }
-      return parsed;
-    }
-
-    async function cloudGet(key) {
-      const urls = [
-        `${WORKER_BASE}?key=${encodeURIComponent(key)}&t=${Date.now()}`,
-        `${WORKER_BASE}/${encodeURIComponent(key)}?t=${Date.now()}`
-      ];
-      for (const u of urls) {
-        try {
-          const res = await fetch(u, { cache: "no-store" });
-          if (res.ok) {
-            const text = await res.text();
-            if (!text || text === "null") return { ok: true, data: null };
-            try {
-              const parsed = JSON.parse(text);
-              return { ok: true, data: unwrapCloudPayload(parsed) };
-            } catch (e) {
-              return { ok: true, data: null };
-            }
-          }
-        } catch (e) {}
-      }
-      return { ok: false, data: null, error: "No respondió GET del Worker" };
-    }
-
-    async function cloudPut(key, payload) {
-      const bodyStr = JSON.stringify(payload);
-      const attempts = [
-        { url: `${WORKER_BASE}?key=${encodeURIComponent(key)}`, method: "PUT", headers: { "Content-Type": "application/json" }, body: bodyStr },
-        { url: `${WORKER_BASE}/${encodeURIComponent(key)}`, method: "PUT", headers: { "Content-Type": "application/json" }, body: bodyStr },
-        { url: `${WORKER_BASE}?key=${encodeURIComponent(key)}`, method: "POST", headers: { "Content-Type": "application/json" }, body: bodyStr },
-        { url: WORKER_BASE, method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, value: payload }) }
-      ];
-      let lastErr = "Error de red o CORS";
-      for (const reqCfg of attempts) {
-        try {
-          const res = await fetch(reqCfg.url, {
-            method: reqCfg.method,
-            headers: reqCfg.headers,
-            body: reqCfg.body
-          });
-          if (res.ok) {
-            return { ok: true };
-          }
-          lastErr = `HTTP ${res.status}`;
-        } catch (err) {
-          lastErr = err && err.message ? err.message : "Fallo fetch (revisa CORS en el Worker)";
-        }
-      }
-      return { ok: false, error: lastErr };
     }
 
     function handleWaBubbleClick(ev) {
@@ -1419,11 +1366,19 @@
         STATE.background.dataUrl = "";
         checkVideoHasAudio();
 
-        const putRes = await cloudPut("store_video_bg", { id: newVidId, dataUrl: videoDataUrl });
-        if (!putRes.ok) {
-          if (statusEl) statusEl.innerText = "⚠️ Error subiendo video: " + putRes.error;
-          showPurpleToast("⚠️ Error subiendo video");
-          return;
+        if (isFirebaseConfigured) {
+          try {
+            const vidRes = await fetch(FIREBASE_VIDEO_URL, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: newVidId, dataUrl: videoDataUrl })
+            });
+            if (!vidRes.ok) throw new Error("HTTP " + vidRes.status);
+          } catch (err) {
+            if (statusEl) statusEl.innerText = "⚠️ Error subiendo video a Firebase";
+            showPurpleToast("⚠️ Video demasiado pesado para Firebase");
+            return;
+          }
         }
         await saveState();
         if (statusEl) statusEl.innerText = "✅ Video activo en vivo";
@@ -1440,12 +1395,17 @@
         const vidId = STATE.background.videoId;
         if (loadedVideoId === vidId && bgVideo.src) return;
         let dataUrl = await getLocalVideo(vidId);
-        if (!dataUrl) {
-          const got = await cloudGet("store_video_bg");
-          if (got.ok && got.data && got.data.dataUrl) {
-            dataUrl = got.data.dataUrl;
-            await saveVideoLocally(vidId, dataUrl);
-          }
+        if (!dataUrl && isFirebaseConfigured) {
+          try {
+            const res = await fetch(FIREBASE_VIDEO_URL + "?t=" + vidId);
+            if (res.ok) {
+              const cloudVid = await res.json();
+              if (cloudVid && cloudVid.dataUrl) {
+                dataUrl = cloudVid.dataUrl;
+                await saveVideoLocally(vidId, dataUrl);
+              }
+            }
+          } catch (e) {}
         }
         if (dataUrl) {
           loadedVideoId = vidId;
@@ -1526,26 +1486,43 @@
       isSavingStock = true;
       updateSyncIndicator("syncing");
       saveLocalStockCache();
+      if (!isFirebaseConfigured) {
+        isSavingStock = false;
+        return false;
+      }
       try {
-        const res = await cloudPut("store_stock_v1", accountsStock);
-        updateSyncIndicator(res.ok ? "ok" : "error", res.error || "Stock guardado");
+        const res = await fetch(FIREBASE_STOCK_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(accountsStock)
+        });
+        updateSyncIndicator(res.ok ? "ok" : "error", res.ok ? `Stock guardado ${new Date().toLocaleTimeString()}` : `HTTP ${res.status}`);
         return res.ok;
+      } catch (e) {
+        updateSyncIndicator("error", "Error de red en stock");
+        return false;
       } finally {
         isSavingStock = false;
       }
     }
 
-    async function pullStockFromCloud(forceApply = false) {
+    async function pullStockFromFirebase(forceApply = false) {
+      if (!isFirebaseConfigured) return accountsStock;
       if (isSavingStock && !forceApply) return accountsStock;
-      const got = await cloudGet("store_stock_v1");
-      if (got.ok && Array.isArray(got.data)) {
-        if (forceApply || JSON.stringify(got.data) !== JSON.stringify(accountsStock)) {
-          accountsStock = got.data;
-          saveLocalStockCache();
-          renderAll();
+      try {
+        const res = await fetch(FIREBASE_STOCK_URL + "?t=" + Date.now(), { cache: "no-store" });
+        if (res.ok) {
+          const cloudStock = await res.json();
+          if (Array.isArray(cloudStock)) {
+            if (forceApply || JSON.stringify(cloudStock) !== JSON.stringify(accountsStock)) {
+              accountsStock = cloudStock;
+              saveLocalStockCache();
+              renderAll();
+            }
+            return cloudStock;
+          }
         }
-        return got.data;
-      }
+      } catch (e) {}
       return accountsStock;
     }
 
@@ -1588,49 +1565,75 @@
       STATE.lastUpdated = Date.now();
       saveLocalCache();
       renderAll();
-      return await pushStateToCloud();
+      return await pushStateToFirebase();
     }
 
-    async function pushStateToCloud() {
+    async function pushStateToFirebase() {
+      if (!isFirebaseConfigured) {
+        updateSyncIndicator("error", "Falta URL de Firebase");
+        return false;
+      }
       isSavingToCloud = true;
       updateSyncIndicator("syncing");
       try {
-        const res = await cloudPut("store_v1", STATE);
-        updateSyncIndicator(res.ok ? "ok" : "error", res.error || `Guardado ${new Date().toLocaleTimeString()}`);
+        const res = await fetch(FIREBASE_DB_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(STATE)
+        });
+        updateSyncIndicator(res.ok ? "ok" : "error", res.ok ? `Guardado ${new Date().toLocaleTimeString()}` : `HTTP ${res.status} (Revisa reglas Firebase)`);
         return res.ok;
+      } catch (err) {
+        updateSyncIndicator("error", "Error de red al guardar en Firebase");
+        return false;
       } finally {
         isSavingToCloud = false;
       }
     }
 
-    async function pullStateFromCloud(forceApply = false) {
-      if (isSavingToCloud && !forceApply) return STATE;
-      const got = await cloudGet("store_v1");
-      if (!got.ok) {
-        updateSyncIndicator("error", got.error || "Sin respuesta del Worker");
+    async function pullStateFromFirebase(forceApply = false) {
+      if (!isFirebaseConfigured) {
+        updateSyncIndicator("error", "Falta URL de Firebase");
         return STATE;
       }
-      if (got.data && typeof got.data === "object") {
-        const cloudTs = Number(got.data.lastUpdated || 0);
+      if (isSavingToCloud && !forceApply) return STATE;
+      try {
+        const res = await fetch(FIREBASE_DB_URL + "?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) {
+          updateSyncIndicator("error", `HTTP ${res.status} al leer Firebase`);
+          return STATE;
+        }
+        const cloudData = await res.json();
+        if (!cloudData) {
+          if (STATE.products.length > 0 || STATE.lastUpdated > 0) {
+            await pushStateToFirebase();
+          } else {
+            updateSyncIndicator("ok", "Base de datos lista (vacía)");
+          }
+          return STATE;
+        }
+        const cloudTs = Number(cloudData.lastUpdated || 0);
         const localTs = Number(STATE.lastUpdated || 0);
-        if (forceApply || cloudTs !== localTs || (STATE.products.length === 0 && Array.isArray(got.data.products) && got.data.products.length > 0)) {
-          STATE = normalizeState(got.data);
+        if (forceApply || cloudTs !== localTs || (STATE.products.length === 0 && Array.isArray(cloudData.products) && cloudData.products.length > 0)) {
+          STATE = normalizeState(cloudData);
           ensureClientRecord(MY_CLIENT_ID);
           saveLocalCache();
           renderAll();
         }
+        updateSyncIndicator("ok", `Sincronizado ${new Date().toLocaleTimeString()}`);
+      } catch (e) {
+        updateSyncIndicator("error", "Sin respuesta de Firebase");
       }
-      updateSyncIndicator("ok", `Sincronizado ${new Date().toLocaleTimeString()}`);
       return STATE;
     }
 
-    async function forcePushToCloud() {
+    async function forcePushToFirebase() {
       const okState = await saveState();
       const okStock = await saveStockState();
       if (okState && okStock) {
-        showPurpleToast("☁️ ¡Subido a la nube! Ya se ve en incógnito");
+        showPurpleToast("☁️ ¡Subido a Firebase! Ya se ve en incógnito");
       } else {
-        showPurpleToast("⚠️ Revisa el diagnóstico de nube");
+        showPurpleToast("⚠️ Revisa la URL o reglas de Firebase");
       }
     }
 
@@ -1709,7 +1712,7 @@
       const pass = document.getElementById("reg-pass").value.trim();
       if (!username || !email || !phone || !pass) return showPurpleToast("✨ Llena los campos");
       const cleanPhone = normalizePhoneForWA(phone);
-      await pullStateFromCloud(false);
+      await pullStateFromFirebase(false);
       const exists = Object.values(STATE.clients || {}).some(c => c.registered && (c.email?.toLowerCase() === email || c.name?.toLowerCase() === username.toLowerCase()));
       if (exists) return showPurpleToast("⚠️ Ese usuario o correo ya está registrado");
       const me = getMyClient();
@@ -1721,7 +1724,7 @@
       const ident = document.getElementById("log-identifier").value.trim().toLowerCase();
       const pass = document.getElementById("log-pass").value.trim();
       if (!ident || !pass) return showPurpleToast("✨ Ingresa credenciales");
-      await pullStateFromCloud(false);
+      await pullStateFromFirebase(false);
       const cleanIdentPhone = normalizePhoneForWA(ident);
       const found = Object.values(STATE.clients || {}).find(c => {
         if (!c.registered) return false;
@@ -2070,7 +2073,7 @@
           : `${STATE.defaultPostBuyMsg || ""}\n🛡️ Garantía: ${warrantyTxt}`;
 
         if (prod.autoDelivery) {
-          await pullStockFromCloud(true);
+          await pullStockFromFirebase(true);
 
           const freeAccIndex = accountsStock.findIndex(a => a.prodId === prod.id && !a.used);
           if (freeAccIndex === -1) {
@@ -2097,7 +2100,7 @@
           }
 
           await new Promise(r => setTimeout(r, 250));
-          const verifiedStock = await pullStockFromCloud(true);
+          const verifiedStock = await pullStockFromFirebase(true);
           const confirmedAcc = (verifiedStock || []).find(a => a.id === targetAccId);
           if (!confirmedAcc || confirmedAcc.lockToken !== lockToken) {
             renderAll();
@@ -2481,7 +2484,7 @@
 
     async function pullStockForResolution() {
       const prodId = document.getElementById("res-stock-prod").value;
-      await pullStockFromCloud(true);
+      await pullStockFromFirebase(true);
       const freeAcc = accountsStock.find(a => a.prodId === prodId && !a.used);
       if (!freeAcc) return showPurpleToast("⚠️ No hay stock libre para ese producto");
       freeAcc.used = true;
@@ -2499,7 +2502,7 @@
     async function cancelResolveReport() {
       const pulledId = document.getElementById("res-pulled-acc-id").value;
       if (pulledId) {
-        await pullStockFromCloud(true);
+        await pullStockFromFirebase(true);
         const acc = accountsStock.find(a => a.id === pulledId);
         if (acc) {
           acc.used = false;
@@ -2588,7 +2591,7 @@
       document.getElementById("stk-codeurl").value = "";
 
       renderAll();
-      showPurpleToast(ok ? "✨ Cuenta guardada en la nube" : "⚠️ Guardada local, revisa nube");
+      showPurpleToast(ok ? "✨ Cuenta guardada en Firebase" : "⚠️ Guardada local, revisa Firebase");
     }
 
     async function adminDeleteStock(id) {
@@ -2652,7 +2655,7 @@
 
       clearProductForm();
       const ok = await saveState();
-      showPurpleToast(ok ? "✨ Guardado y sincronizado en la nube" : "⚠️ Guardado local, revisa nube");
+      showPurpleToast(ok ? "✨ Guardado y sincronizado en Firebase" : "⚠️ Guardado local, revisa Firebase");
     }
 
     function adminLoadProductToEdit(id) {
@@ -2756,7 +2759,7 @@
         STATE.background.videoId = "";
       }
       const ok = await saveState();
-      showPurpleToast(ok ? "✨ Diseño guardado en la nube" : "⚠️ Guardado local, revisa nube");
+      showPurpleToast(ok ? "✨ Diseño guardado en Firebase" : "⚠️ Guardado local, revisa Firebase");
     }
 
     async function adminAddSong() {
@@ -2816,11 +2819,11 @@
 
     generateNewRefCode();
     renderAll();
-    pullStateFromCloud(true);
-    pullStockFromCloud(true);
+    pullStateFromFirebase(true);
+    pullStockFromFirebase(true);
     setInterval(() => {
-      pullStateFromCloud(false);
-      pullStockFromCloud(false);
+      pullStateFromFirebase(false);
+      pullStockFromFirebase(false);
     }, 3500);
   </script>
 </body>
