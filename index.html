@@ -700,7 +700,7 @@
       <img id="top-logo" src="" alt="Logo" onclick="onProfilePicClick()" />
       <div style="min-width:0;">
         <div class="brand-mini-title" id="top-store-name">CocobongoStore</div>
-        <div style="font-size:10px;color:#34d399;" id="sync-status-mini">● En línea 24/7</div>
+        <div style="font-size:10px;color:#34d399;" id="sync-status-mini">● Conectando...</div>
       </div>
     </div>
     <div class="top-actions">
@@ -719,7 +719,7 @@
       <label for="quick-profile-input" id="hero-edit-chip" class="avatar-edit-chip">📷 Foto</label>
     </div>
     <h1 class="hero-title" id="hero-store-name">CocobongoStore</h1>
-    <p class="hero-sub" id="hero-store-slogan">TU_SLOGAN_AQUI</p>
+    <p class="hero-sub" id="hero-store-slogan">Cargando tienda...</p>
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-val" id="stat-disponibles">0</div><div class="stat-lbl">Disponibles</div></div>
       <div class="stat-card"><div class="stat-val" id="stat-entregadas">0</div><div class="stat-lbl">Entregadas</div></div>
@@ -803,7 +803,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
           <div>
             <h2 style="font-size:18px;color:var(--warning);">👑 Panel Administración</h2>
-            <div id="firebase-status-banner" style="font-size:12px;color:#34d399;font-weight:700;">🟢 Sincronizado en vivo (Cloudflare KV)</div>
+            <div id="firebase-status-banner" style="font-size:12px;color:#34d399;font-weight:700;">🟢 Verificando conexión...</div>
           </div>
           <div style="display:flex;gap:6px;">
             <button class="btn-outline" onclick="switchView('tienda')">🛍️ Tienda</button>
@@ -819,7 +819,7 @@
           <button class="nav-tab" onclick="switchAdminTab('adm-categorias', this)">📂 Categorías</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-diseno', this)">🎨 Diseño, Fondo & Bot WA</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-musica', this)">🎵 Música</button>
-          <button class="nav-tab" onclick="switchAdminTab('adm-export', this)">💾 Respaldo</button>
+          <button class="nav-tab" onclick="switchAdminTab('adm-export', this)">☁️ Nube / Respaldo</button>
         </div>
 
         <div id="adm-recargas" class="adm-tab">
@@ -962,11 +962,11 @@
             <label>Datos Bancarios / SPEI para Recargas</label>
             <textarea id="cfg-bank-info" rows="3" placeholder="Ej. Banco: BBVA / SPEI&#10;CLABE: 012345678901234567"></textarea>
           </div>
-          <div class="field-group"><label>WhatsApp Admin (Burbuja y avisos)</label><input type="text" id="cfg-wa-number" placeholder="TU_NUMERO_WHATSAPP" /></div>
-          <div class="field-group"><label>Telegram Bot Token</label><input type="text" id="cfg-tg-token" placeholder="TU_TELEGRAM_BOT_TOKEN" /></div>
-          <div class="field-group"><label>Telegram Chat ID</label><input type="text" id="cfg-tg-chat-id" placeholder="TU_TELEGRAM_CHAT_ID" /></div>
-          <div class="field-group"><label>UltraMsg Instance ID</label><input type="text" id="cfg-wa-api-instance" placeholder="TU_ULTRAMSG_INSTANCE_ID" /></div>
-          <div class="field-group"><label>UltraMsg Token</label><input type="text" id="cfg-wa-api-token" placeholder="TU_ULTRAMSG_TOKEN" /></div>
+          <div class="field-group"><label>WhatsApp Admin (Burbuja y avisos)</label><input type="text" id="cfg-wa-number" placeholder="Ej. 5523676793" /></div>
+          <div class="field-group"><label>Telegram Bot Token</label><input type="text" id="cfg-tg-token" placeholder="Token del bot" /></div>
+          <div class="field-group"><label>Telegram Chat ID</label><input type="text" id="cfg-tg-chat-id" placeholder="Chat ID" /></div>
+          <div class="field-group"><label>UltraMsg Instance ID</label><input type="text" id="cfg-wa-api-instance" placeholder="Instance ID" /></div>
+          <div class="field-group"><label>UltraMsg Token</label><input type="text" id="cfg-wa-api-token" placeholder="Token" /></div>
           <button class="btn-main" onclick="adminSaveDesign()">💾 Guardar</button>
         </div>
 
@@ -977,7 +977,13 @@
           <div id="adm-songs-list" style="margin-top:10px;"></div>
         </div>
 
-        <div id="adm-export" class="adm-tab" style="display:none;"><button class="btn-main" onclick="forcePushToCloud()">☁️ Sincronizar Ahora</button></div>
+        <div id="adm-export" class="adm-tab" style="display:none;">
+          <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;line-height:1.45;">
+            Usa este botón para subir a la nube todo lo que ya editaste en este dispositivo y que aparezca en incógnito y a todos los clientes:
+          </p>
+          <button class="btn-main" onclick="forcePushToCloud()">☁️ Subir mi tienda actual a la nube</button>
+          <div id="cloud-diag-box" style="margin-top:10px;font-size:11.5px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:10px;border-radius:10px;word-break:break-all;"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -1130,7 +1136,7 @@
       el.innerText = msg || "✨ Se guardó con éxito";
       el.classList.add("show");
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.classList.remove("show"); }, 1400);
+      toastTimer = setTimeout(() => { el.classList.remove("show"); }, 1600);
     }
     window.alert = function(msg) { showPurpleToast(msg); };
 
@@ -1190,10 +1196,11 @@
       document.body.removeChild(ta);
     }
 
-    // CONEXIÓN DIRECTA A TU CLOUDFLARE WORKER (KV)
-    const CLOUD_DB_URL = "https://cocobongo.dessireecampos07.workers.dev?key=store_v1";
-    const CLOUD_VIDEO_URL = "https://cocobongo.dessireecampos07.workers.dev?key=store_video_bg";
-    const CLOUD_STOCK_URL = "https://cocobongo.dessireecampos07.workers.dev?key=store_stock_v1";
+    // CONEXIÓN A TU CLOUDFLARE WORKER (KV)
+    const WORKER_BASE = "https://cocobongo.dessireecampos07.workers.dev";
+    const CLOUD_DB_URL = `${WORKER_BASE}?key=store_v1`;
+    const CLOUD_VIDEO_URL = `${WORKER_BASE}?key=store_video_bg`;
+    const CLOUD_STOCK_URL = `${WORKER_BASE}?key=store_stock_v1`;
 
     const STORAGE_KEY = "COCOBONGOSTORE_CLOUD_CACHE_V1";
     const STOCK_STORAGE_KEY = "COCOBONGOSTORE_STOCK_CACHE_V1";
@@ -1205,20 +1212,74 @@
     let isSavingStock = false;
     let isSavingToCloud = false;
     let isExecutingPurchase = false;
+    let lastCloudError = "";
 
-    function updateSyncIndicator(state) {
+    function updateSyncIndicator(state, detail = "") {
       const mini = document.getElementById("sync-status-mini");
       const banner = document.getElementById("firebase-status-banner");
+      const diag = document.getElementById("cloud-diag-box");
+      if (detail) lastCloudError = detail;
+
       if (state === "syncing") {
         if (mini) { mini.innerText = "● Guardando..."; mini.style.color = "#f59e0b"; }
-        if (banner) { banner.innerText = "🟡 Sincronizando con Cloudflare..."; banner.style.color = "#f59e0b"; }
+        if (banner) { banner.innerText = "🟡 Guardando en la nube..."; banner.style.color = "#f59e0b"; }
       } else if (state === "error") {
-        if (mini) { mini.innerText = "● Sin conexión"; mini.style.color = "#ef4444"; }
-        if (banner) { banner.innerText = "🔴 Error de red (reintentando...)"; banner.style.color = "#ef4444"; }
+        if (mini) { mini.innerText = "● Error nube"; mini.style.color = "#ef4444"; }
+        if (banner) { banner.innerText = "🔴 Error al conectar/guardar: " + (detail || "Revisa CORS o Worker"); banner.style.color = "#ef4444"; }
       } else {
         if (mini) { mini.innerText = "● En línea 24/7"; mini.style.color = "#34d399"; }
-        if (banner) { banner.innerText = "🟢 Sincronizado en vivo (Cloudflare KV)"; banner.style.color = "#34d399"; }
+        if (banner) { banner.innerText = "🟢 Sincronizado con la nube"; banner.style.color = "#34d399"; }
       }
+      if (diag) {
+        diag.innerHTML = `<b>Worker:</b> ${escapeHtml(WORKER_BASE)}<br><b>Productos en memoria:</b> ${STATE.products.length} • <b>Stock en memoria:</b> ${accountsStock.length}<br><b>Último detalle:</b> ${escapeHtml(detail || lastCloudError || "OK")}`;
+      }
+    }
+
+    async function cloudGet(key) {
+      const urls = [
+        `${WORKER_BASE}?key=${encodeURIComponent(key)}&t=${Date.now()}`,
+        `${WORKER_BASE}/${encodeURIComponent(key)}?t=${Date.now()}`
+      ];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, { cache: "no-store" });
+          if (res.ok) {
+            const text = await res.text();
+            if (!text || text === "null") return { ok: true, data: null };
+            try {
+              return { ok: true, data: JSON.parse(text) };
+            } catch (e) {
+              return { ok: true, data: null };
+            }
+          }
+        } catch (e) {}
+      }
+      return { ok: false, data: null, error: "No respondió GET del Worker" };
+    }
+
+    async function cloudPut(key, payload) {
+      const bodyStr = JSON.stringify(payload);
+      const endpoints = [
+        `${WORKER_BASE}?key=${encodeURIComponent(key)}`,
+        `${WORKER_BASE}/${encodeURIComponent(key)}`
+      ];
+      let lastErr = "Error de red o CORS en PUT";
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: bodyStr
+          });
+          if (res.ok) {
+            return { ok: true };
+          }
+          lastErr = `HTTP ${res.status}`;
+        } catch (err) {
+          lastErr = err && err.message ? err.message : "Fallo fetch PUT (posible CORS)";
+        }
+      }
+      return { ok: false, error: lastErr };
     }
 
     function handleWaBubbleClick(ev) {
@@ -1235,7 +1296,7 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       compressImageFile(file, 1080, 0.85, true, async function(dataUrl) {
-        await pullStateFromCloud(true);
+        await pullStateFromCloud(false);
         STATE.background.type = "image";
         STATE.background.dataUrl = dataUrl;
         STATE.background.videoId = "";
@@ -1343,14 +1404,9 @@
         STATE.background.dataUrl = "";
         checkVideoHasAudio();
 
-        try {
-          const vidRes = await fetch(CLOUD_VIDEO_URL, {
-            method: "PUT", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: newVidId, dataUrl: videoDataUrl })
-          });
-          if (!vidRes.ok) throw new Error("Upload video error");
-        } catch (err) {
-          if (statusEl) statusEl.innerText = "⚠️ No se pudo subir el video a la nube";
+        const putRes = await cloudPut("store_video_bg", { id: newVidId, dataUrl: videoDataUrl });
+        if (!putRes.ok) {
+          if (statusEl) statusEl.innerText = "⚠️ Error subiendo video: " + putRes.error;
           showPurpleToast("⚠️ Error subiendo video");
           return;
         }
@@ -1370,13 +1426,11 @@
         if (loadedVideoId === vidId && bgVideo.src) return;
         let dataUrl = await getLocalVideo(vidId);
         if (!dataUrl) {
-          try {
-            const res = await fetch(CLOUD_VIDEO_URL + "&t=" + vidId);
-            if (res.ok) {
-              const cloudVid = await res.json();
-              if (cloudVid && cloudVid.dataUrl) { dataUrl = cloudVid.dataUrl; await saveVideoLocally(vidId, dataUrl); }
-            }
-          } catch (e) {}
+          const got = await cloudGet("store_video_bg");
+          if (got.ok && got.data && got.data.dataUrl) {
+            dataUrl = got.data.dataUrl;
+            await saveVideoLocally(vidId, dataUrl);
+          }
         }
         if (dataUrl) {
           loadedVideoId = vidId;
@@ -1423,52 +1477,25 @@
     const DEFAULT_STATE = {
       lastUpdated: 0,
       storeName: "CocobongoStore",
-      storeSlogan: "TU_SLOGAN_AQUI",
-      profilePic: "TU_URL_DE_LOGO_O_AVATAR",
+      storeSlogan: "Cuentas Digitales y Entrega Rápida 24/7",
+      profilePic: "",
       waNumber: "TU_NUMERO_WHATSAPP",
       waApiInstance: "TU_ULTRAMSG_INSTANCE_ID",
       waApiToken: "TU_ULTRAMSG_TOKEN",
       tgToken: "TU_TELEGRAM_BOT_TOKEN",
       tgChatId: "TU_TELEGRAM_CHAT_ID",
-      defaultCodeUrl: "TU_URL_DE_CODIGOS",
+      defaultCodeUrl: "",
       defaultPostBuyMsg: "📌 Garantía: 25 días base; si tu cuenta es de más de 1 mes, la garantía aumenta según el tiempo de la cuenta.",
-      bankInfo: "🏦 Banco: TU_BANCO\n💳 Cuenta / CLABE: TU_CLABE_SPEI",
+      bankInfo: "🏦 Banco / Transferencia\n💳 Solicita datos o revisa el concepto de 7 dígitos",
       colors: { primary: "#ff2a85", secondary: "#00e5ff", accent: "#7c4dff", purpleAccent: "#7c3aed", bg: "#080b14", overlayOpacity: 0.55 },
       background: { type: "particles", dataUrl: "", videoId: "" },
       deliveredCount: 0,
       categories: [
-        { id: "all", name: "Todo", icon: "✨", img: "" },
-        { id: "cat_1", name: "CATEGORIA_1", icon: "📦", img: "" },
-        { id: "cat_2", name: "CATEGORIA_2", icon: "⭐", img: "" }
+        { id: "all", name: "Todo", icon: "✨", img: "" }
       ],
-      products: [
-        {
-          id: "prod_ejemplo_1",
-          name: "NOMBRE_DEL_PRODUCTO",
-          price: 0,
-          cat: "cat_1",
-          desc: "DESCRIPCION_DEL_PRODUCTO",
-          warranty: "25 días garantía • +1 mes = garantía mayor según tiempo",
-          postBuyMsg: "INSTRUCCIONES_POST_COMPRA",
-          tags: ["ETIQUETA_1"],
-          gradient: "transparent",
-          img: "TU_URL_DE_IMAGEN_PRODUCTO",
-          autoDelivery: true,
-          manualStock: 0,
-          askEmail: false,
-          askPass: false,
-          askId: false,
-          showEmail: true,
-          showPass: true,
-          showProfile: true,
-          showId: false,
-          showCodeUrl: true
-        }
-      ],
+      products: [],
       clients: {}, salesHistory: [], rechargeRequests: [], reports: [], adminNotifications: [],
-      songs: [
-        { title: "TITULO_CANCION_1", url: "TU_URL_MP3_1" }
-      ]
+      songs: []
     };
 
     let STATE = loadLocalCache();
@@ -1485,36 +1512,25 @@
       updateSyncIndicator("syncing");
       saveLocalStockCache();
       try {
-        const res = await fetch(CLOUD_STOCK_URL, {
-          method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(accountsStock)
-        });
-        updateSyncIndicator(res.ok ? "ok" : "error");
+        const res = await cloudPut("store_stock_v1", accountsStock);
+        updateSyncIndicator(res.ok ? "ok" : "error", res.error || "Stock guardado");
         return res.ok;
-      } catch (e) {
-        updateSyncIndicator("error");
-        return false;
       } finally {
         isSavingStock = false;
       }
     }
 
-    async function pullStockFromCloud() {
-      if (isSavingStock) return accountsStock;
-      try {
-        const res = await fetch(CLOUD_STOCK_URL + "&t=" + Date.now(), { cache: "no-store" });
-        if (res.ok) {
-          const cloudStock = await res.json();
-          if (Array.isArray(cloudStock)) {
-            if (JSON.stringify(cloudStock) !== JSON.stringify(accountsStock)) {
-              accountsStock = cloudStock;
-              saveLocalStockCache();
-              renderAll();
-            }
-            return cloudStock;
-          }
+    async function pullStockFromCloud(forceApply = false) {
+      if (isSavingStock && !forceApply) return accountsStock;
+      const got = await cloudGet("store_stock_v1");
+      if (got.ok && Array.isArray(got.data)) {
+        if (forceApply || JSON.stringify(got.data) !== JSON.stringify(accountsStock)) {
+          accountsStock = got.data;
+          saveLocalStockCache();
+          renderAll();
         }
-      } catch (e) {}
+        return got.data;
+      }
       return accountsStock;
     }
 
@@ -1536,7 +1552,7 @@
       const merged = Object.assign({}, DEFAULT_STATE, raw || {});
       merged.colors = Object.assign({}, DEFAULT_STATE.colors, (raw && raw.colors) || {});
       merged.background = Object.assign({}, DEFAULT_STATE.background, (raw && raw.background) || {});
-      merged.categories = Array.isArray(merged.categories) ? merged.categories : DEFAULT_STATE.categories;
+      merged.categories = Array.isArray(merged.categories) && merged.categories.length ? merged.categories : DEFAULT_STATE.categories;
       merged.products = Array.isArray(merged.products) ? merged.products : [];
       merged.salesHistory = Array.isArray(merged.salesHistory) ? merged.salesHistory : [];
       merged.rechargeRequests = Array.isArray(merged.rechargeRequests) ? merged.rechargeRequests : [];
@@ -1557,23 +1573,16 @@
       STATE.lastUpdated = Date.now();
       saveLocalCache();
       renderAll();
-      await pushStateToCloud();
+      return await pushStateToCloud();
     }
 
     async function pushStateToCloud() {
       isSavingToCloud = true;
       updateSyncIndicator("syncing");
       try {
-        const res = await fetch(CLOUD_DB_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(STATE)
-        });
-        updateSyncIndicator(res.ok ? "ok" : "error");
+        const res = await cloudPut("store_v1", STATE);
+        updateSyncIndicator(res.ok ? "ok" : "error", res.error || `Guardado ${new Date().toLocaleTimeString()}`);
         return res.ok;
-      } catch (err) {
-        updateSyncIndicator("error");
-        return false;
       } finally {
         isSavingToCloud = false;
       }
@@ -1581,25 +1590,33 @@
 
     async function pullStateFromCloud(forceApply = false) {
       if (isSavingToCloud && !forceApply) return STATE;
-      try {
-        const res = await fetch(CLOUD_DB_URL + "&t=" + Date.now(), { cache: "no-store" });
-        if (res.ok) {
-          const cloudData = await res.json();
-          if (!cloudData) { await pushStateToCloud(); return STATE; }
-          if (forceApply || !STATE.lastUpdated || (cloudData.lastUpdated && cloudData.lastUpdated !== STATE.lastUpdated)) {
-            STATE = normalizeState(cloudData);
-            ensureClientRecord(MY_CLIENT_ID);
-            saveLocalCache();
-            renderAll();
-          }
-          updateSyncIndicator("ok");
+      const got = await cloudGet("store_v1");
+      if (!got.ok) {
+        updateSyncIndicator("error", got.error || "Sin respuesta del Worker");
+        return STATE;
+      }
+      if (got.data && typeof got.data === "object") {
+        const cloudTs = Number(got.data.lastUpdated || 0);
+        const localTs = Number(STATE.lastUpdated || 0);
+        if (forceApply || cloudTs !== localTs || (STATE.products.length === 0 && Array.isArray(got.data.products) && got.data.products.length > 0)) {
+          STATE = normalizeState(got.data);
+          ensureClientRecord(MY_CLIENT_ID);
+          saveLocalCache();
+          renderAll();
         }
-      } catch (e) {}
+      }
+      updateSyncIndicator("ok", `Sincronizado ${new Date().toLocaleTimeString()}`);
       return STATE;
     }
 
-    function forcePushToCloud() {
-      saveState().then(() => saveStockState()).then(() => showPurpleToast("✨ Todo sincronizado en vivo"));
+    async function forcePushToCloud() {
+      const okState = await saveState();
+      const okStock = await saveStockState();
+      if (okState && okStock) {
+        showPurpleToast("☁️ ¡Subido a la nube! Ya se ve en incógnito");
+      } else {
+        showPurpleToast("⚠️ Revisa el diagnóstico de nube");
+      }
     }
 
     function pushAdminNotification(text, linkId) {
@@ -1677,7 +1694,7 @@
       const pass = document.getElementById("reg-pass").value.trim();
       if (!username || !email || !phone || !pass) return showPurpleToast("✨ Llena los campos");
       const cleanPhone = normalizePhoneForWA(phone);
-      await pullStateFromCloud(true);
+      await pullStateFromCloud(false);
       const exists = Object.values(STATE.clients || {}).some(c => c.registered && (c.email?.toLowerCase() === email || c.name?.toLowerCase() === username.toLowerCase()));
       if (exists) return showPurpleToast("⚠️ Ese usuario o correo ya está registrado");
       const me = getMyClient();
@@ -1689,7 +1706,7 @@
       const ident = document.getElementById("log-identifier").value.trim().toLowerCase();
       const pass = document.getElementById("log-pass").value.trim();
       if (!ident || !pass) return showPurpleToast("✨ Ingresa credenciales");
-      await pullStateFromCloud(true);
+      await pullStateFromCloud(false);
       const cleanIdentPhone = normalizePhoneForWA(ident);
       const found = Object.values(STATE.clients || {}).find(c => {
         if (!c.registered) return false;
@@ -1740,7 +1757,6 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       compressImageFile(file, 360, 0.85, true, async function(dataUrl) {
-        await pullStateFromCloud(true);
         STATE.profilePic = dataUrl;
         await saveState();
         showPurpleToast("✨ Se guardó con éxito");
@@ -1771,7 +1787,6 @@
     }
 
     async function resetBackgroundToParticles() {
-      await pullStateFromCloud(true);
       STATE.background = { type: "particles", dataUrl: "", videoId: "" };
       document.getElementById("cfg-bg-img-url").value = "";
       document.getElementById("cfg-bg-vid-url").value = "";
@@ -1872,6 +1887,10 @@
     function renderCatalog() {
       const q = (document.getElementById("search-input").value || "").toLowerCase();
       const grid = document.getElementById("products-grid");
+      if (!STATE.products.length) {
+        grid.innerHTML = `<div class="panel-card" style="grid-column:1/-1;text-align:center;color:var(--muted);">Aún no hay productos publicados. Entra al panel de administración para agregarlos.</div>`;
+        return;
+      }
       const activeCatObj = STATE.categories.find(c => c.id === currentCat);
       const activeCatName = activeCatObj ? activeCatObj.name.toLowerCase() : "";
 
@@ -1923,7 +1942,6 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       compressImageFile(file, 600, 0.88, true, async function(dataUrl) {
-        await pullStateFromCloud(true);
         const p = STATE.products.find(x => x.id === prodId);
         if (p) { p.img = dataUrl; await saveState(); showPurpleToast("✨ Se guardó con éxito"); }
       });
@@ -2011,7 +2029,6 @@
       if (buyBtn) { buyBtn.disabled = true; buyBtn.innerText = "⏳ Procesando..."; }
 
       try {
-        await pullStateFromCloud(true);
         const prod = STATE.products.find(p => p.id === pendingBuyProdId);
         if (!prod) return;
         const me = getMyClient();
@@ -2038,7 +2055,7 @@
           : `${STATE.defaultPostBuyMsg || ""}\n🛡️ Garantía: ${warrantyTxt}`;
 
         if (prod.autoDelivery) {
-          await pullStockFromCloud();
+          await pullStockFromCloud(true);
 
           const freeAccIndex = accountsStock.findIndex(a => a.prodId === prod.id && !a.used);
           if (freeAccIndex === -1) {
@@ -2065,7 +2082,7 @@
           }
 
           await new Promise(r => setTimeout(r, 250));
-          const verifiedStock = await pullStockFromCloud();
+          const verifiedStock = await pullStockFromCloud(true);
           const confirmedAcc = (verifiedStock || []).find(a => a.id === targetAccId);
           if (!confirmedAcc || confirmedAcc.lockToken !== lockToken) {
             renderAll();
@@ -2183,7 +2200,6 @@
       const btn = document.getElementById("btn-submit-recharge");
       if (btn) btn.disabled = true;
       try {
-        await pullStateFromCloud(true);
         const req = { id: "rec_" + Date.now(), clientId: MY_CLIENT_ID, clientName: `${me.name} | ${me.phone}`, amount, refCode: document.getElementById("recharge-ref-code").innerText, capture: window.recCaptureData, status: "Pendiente", date: new Date().toLocaleString() };
         STATE.rechargeRequests.unshift(req);
         pushAdminNotification(`💳 Recarga de ${me.name} por $${amount}`);
@@ -2216,7 +2232,6 @@
       if (btn) btn.disabled = true;
 
       try {
-        await pullStateFromCloud(true);
         const newRep = {
           id: "rep_" + Date.now(),
           clientId: MY_CLIENT_ID,
@@ -2308,7 +2323,7 @@
     function renderAdminPanels() {
       document.getElementById("stk-prod-id").innerHTML = STATE.products.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("res-stock-prod").innerHTML = document.getElementById("stk-prod-id").innerHTML;
-      document.getElementById("p-cat").innerHTML = STATE.categories.filter(c => c.id !== "all").map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+      document.getElementById("p-cat").innerHTML = STATE.categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
       document.getElementById("adm-target-client").innerHTML = Object.values(STATE.clients || {}).map(c => `<option value="${c.id}">${escapeHtml(c.name)} ($${Number(c.balance || 0).toFixed(2)})</option>`).join("");
 
       document.getElementById("cfg-color-purple").value = STATE.colors.purpleAccent || "#7c3aed";
@@ -2333,6 +2348,8 @@
         bgImgPrev.src = STATE.background.dataUrl;
         bgImgPrev.style.display = "block";
       }
+
+      updateSyncIndicator(lastCloudError.includes("Error") || lastCloudError.includes("HTTP") ? "error" : "ok");
 
       document.getElementById("adm-recent-sales-list").innerHTML = (STATE.salesHistory || []).length ? STATE.salesHistory.slice(0, 15).map(s => `
         <div style="background:rgba(16,185,129,0.08);padding:8px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -2411,7 +2428,6 @@
 
     async function confirmEditSale() {
       const saleId = document.getElementById("edit-sale-id").value;
-      await pullStateFromCloud(true);
       const s = (STATE.salesHistory || []).find(x => x.id === saleId);
       if (!s) return;
 
@@ -2450,7 +2466,7 @@
 
     async function pullStockForResolution() {
       const prodId = document.getElementById("res-stock-prod").value;
-      await pullStockFromCloud();
+      await pullStockFromCloud(true);
       const freeAcc = accountsStock.find(a => a.prodId === prodId && !a.used);
       if (!freeAcc) return showPurpleToast("⚠️ No hay stock libre para ese producto");
       freeAcc.used = true;
@@ -2468,7 +2484,7 @@
     async function cancelResolveReport() {
       const pulledId = document.getElementById("res-pulled-acc-id").value;
       if (pulledId) {
-        await pullStockFromCloud();
+        await pullStockFromCloud(true);
         const acc = accountsStock.find(a => a.id === pulledId);
         if (acc) {
           acc.used = false;
@@ -2483,7 +2499,6 @@
 
     async function confirmResolveReport() {
       const repId = document.getElementById("res-report-id").value;
-      await pullStateFromCloud(true);
       const r = STATE.reports.find(x => x.id === repId);
       if (!r) return;
       const email = document.getElementById("res-new-email").value.trim();
@@ -2516,7 +2531,6 @@
     }
 
     async function adminApproveRecharge(reqId) {
-      await pullStateFromCloud(true);
       const r = STATE.rechargeRequests.find(x => x.id === reqId);
       if (!r || r.status === "Aprobada") return;
       r.status = "Aprobada";
@@ -2531,7 +2545,6 @@
       const clientId = document.getElementById("adm-target-client").value;
       const amt = Number(document.getElementById("adm-manual-bal").value);
       if (!clientId || isNaN(amt)) return showPurpleToast("⚠️ Datos incompletos");
-      await pullStateFromCloud(true);
       const client = STATE.clients[clientId];
       if (!client) return showPurpleToast("⚠️ Cliente no encontrado");
       if (isSum) client.balance = Number(client.balance || 0) + amt;
@@ -2550,9 +2563,8 @@
       const codeUrl = document.getElementById("stk-codeurl").value.trim();
       if (!email) return showPurpleToast("📧 Falta correo");
 
-      await pullStockFromCloud();
       accountsStock.push({ id: "acc_" + Date.now() + "_" + Math.floor(Math.random() * 999), prodId, email, pass, profile, customId, codeUrl, used: false });
-      await saveStockState();
+      const ok = await saveStockState();
 
       document.getElementById("stk-email").value = "";
       document.getElementById("stk-pass").value = "";
@@ -2561,11 +2573,10 @@
       document.getElementById("stk-codeurl").value = "";
 
       renderAll();
-      showPurpleToast("✨ Cuenta guardada en la nube");
+      showPurpleToast(ok ? "✨ Cuenta guardada en la nube" : "⚠️ Guardada local, revisa nube");
     }
 
     async function adminDeleteStock(id) {
-      await pullStockFromCloud();
       accountsStock = accountsStock.filter(a => a.id !== id);
       await saveStockState();
       renderAll();
@@ -2596,7 +2607,6 @@
       const price = Number(document.getElementById("p-price").value);
       if (!name || isNaN(price)) return showPurpleToast("📦 Datos incompletos");
 
-      await pullStateFromCloud(true);
       const existingProd = editId ? STATE.products.find(x => x.id === editId) : null;
       const rawTags = document.getElementById("p-tags").value.split(",").map(t => t.trim()).filter(Boolean);
 
@@ -2604,12 +2614,12 @@
         id: editId || ("p_" + Date.now()),
         name,
         price,
-        cat: document.getElementById("p-cat").value,
+        cat: document.getElementById("p-cat").value || "all",
         desc: document.getElementById("p-desc").value,
         warranty: document.getElementById("p-warranty").value.trim() || "25 días garantía • +1 mes = garantía mayor según tiempo",
         postBuyMsg: document.getElementById("p-post-buy-msg").value,
         tags: rawTags,
-        img: window.prodImgData || (existingProd ? existingProd.img : STATE.profilePic),
+        img: window.prodImgData || (existingProd ? existingProd.img : ""),
         autoDelivery: document.getElementById("p-auto-delivery").checked,
         manualStock: Number(document.getElementById("p-manual-stock").value || 10),
         askEmail: document.getElementById("p-ask-email").checked,
@@ -2626,8 +2636,8 @@
       }
 
       clearProductForm();
-      await saveState();
-      showPurpleToast("✨ Se guardó con éxito");
+      const ok = await saveState();
+      showPurpleToast(ok ? "✨ Guardado y sincronizado en la nube" : "⚠️ Guardado local, revisa nube");
     }
 
     function adminLoadProductToEdit(id) {
@@ -2657,7 +2667,6 @@
     }
 
     async function adminDeleteProduct(id) {
-      await pullStateFromCloud(true);
       STATE.products = STATE.products.filter(p => p.id !== id);
       await saveState();
       showPurpleToast("✨ Eliminado");
@@ -2668,7 +2677,6 @@
       const name = document.getElementById("cat-name-input").value.trim();
       const icon = document.getElementById("cat-icon-input").value.trim() || "📁";
       if (!name) return showPurpleToast("⚠️ Ingresa nombre de categoría");
-      await pullStateFromCloud(true);
       const existingCat = editId ? STATE.categories.find(c => c.id === editId) : null;
       const catObj = { id: editId || ("cat_" + Date.now()), name, icon, img: window.catImgData || (existingCat ? existingCat.img : "") };
       if (editId) {
@@ -2698,14 +2706,12 @@
     }
 
     async function adminDeleteCategory(id) {
-      await pullStateFromCloud(true);
       STATE.categories = STATE.categories.filter(c => c.id !== id);
       await saveState();
       showPurpleToast("✨ Categoría eliminada");
     }
 
     async function adminSaveDesign() {
-      await pullStateFromCloud(true);
       STATE.colors = Object.assign({}, STATE.colors, {
         purpleAccent: document.getElementById("cfg-color-purple").value || STATE.colors.purpleAccent,
         accent: document.getElementById("cfg-color-accent").value || STATE.colors.accent,
@@ -2734,15 +2740,14 @@
         STATE.background.dataUrl = imgUrl;
         STATE.background.videoId = "";
       }
-      await saveState();
-      showPurpleToast("✨ Diseño guardado");
+      const ok = await saveState();
+      showPurpleToast(ok ? "✨ Diseño guardado en la nube" : "⚠️ Guardado local, revisa nube");
     }
 
     async function adminAddSong() {
       const title = document.getElementById("song-title-input").value.trim();
       const url = document.getElementById("song-url-input").value.trim();
       if (!title || !url || url === "TU_URL_MP3_1") return showPurpleToast("⚠️ Ingresa título y URL válida");
-      await pullStateFromCloud(true);
       if (!Array.isArray(STATE.songs)) STATE.songs = [];
       STATE.songs.push({ title, url });
       document.getElementById("song-title-input").value = "";
@@ -2752,7 +2757,6 @@
     }
 
     async function adminDeleteSong(idx) {
-      await pullStateFromCloud(true);
       if (!Array.isArray(STATE.songs)) return;
       STATE.songs.splice(idx, 1);
       await saveState();
@@ -2798,10 +2802,10 @@
     generateNewRefCode();
     renderAll();
     pullStateFromCloud(true);
-    pullStockFromCloud();
+    pullStockFromCloud(true);
     setInterval(() => {
       pullStateFromCloud(false);
-      pullStockFromCloud();
+      pullStockFromCloud(false);
     }, 3500);
   </script>
 </body>
