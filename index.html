@@ -66,7 +66,7 @@
       position: relative;
     }
 
-    /* ANUNCIO FLOTANTE MORADO DE 1 SEGUNDO */
+    /* ANUNCIO FLOTANTE MORADO */
     #purple-toast {
       position: fixed;
       top: 22px;
@@ -358,6 +358,7 @@
       box-shadow: 0 0 22px rgba(0, 229, 255, 0.45);
       position: relative;
       z-index: 2;
+      background: rgba(17, 23, 38, 0.9);
     }
     .avatar-edit-chip {
       position: absolute;
@@ -429,9 +430,7 @@
       background: linear-gradient(135deg, rgba(255, 42, 133, 0.28), rgba(0, 229, 255, 0.22));
     }
 
-    /* =========================================================
-       PRODUCTOS: IMAGEN OCUPANDO TODO EL RECUADRO SIN FONDOS
-       ========================================================= */
+    /* PRODUCTOS */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(162px, 1fr));
@@ -482,8 +481,6 @@
     .prod-title { font-size: 14px; font-weight: 800; }
     .prod-desc { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
     .prod-warranty { font-size: 10.5px; font-weight: 700; color: #fde047; line-height: 1.25; }
-    .combo-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-    .combo-tag { font-size: 9.5px; background: rgba(255, 255, 255, 0.09); padding: 2px 6px; border-radius: 6px; color: #e2e8f0; }
     .prod-price { font-size: 18px; font-weight: 900; color: #34d399; margin-top: auto; }
     .btn-main {
       width: 100%; border: none; background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -654,7 +651,7 @@
 </head>
 <body>
 
-  <!-- ANUNCIO FLOTANTE MORADO DE 1 SEGUNDO -->
+  <!-- ANUNCIO FLOTANTE MORADO -->
   <div id="purple-toast" data-app="store">✨ Se guardó con éxito</div>
 
   <!-- BOTÓN AUDIO VIDEO -->
@@ -759,7 +756,7 @@
           <label for="rec-capture-input" class="upload-label">📸 Subir captura<img id="rec-capture-preview" class="upload-preview" /></label>
           <input type="file" id="rec-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rec-capture-preview', 'recCaptureData', false, 960, 0.92)" />
         </div>
-        <button class="btn-main" onclick="submitRechargeRequest()">⚡ Enviar Recarga</button>
+        <button class="btn-main" id="btn-submit-recharge" onclick="submitRechargeRequest()">⚡ Enviar Recarga</button>
       </div>
     </section>
 
@@ -796,7 +793,7 @@
           <label for="rep-capture-input" class="upload-label">📸 Subir captura<img id="rep-capture-preview" class="upload-preview" /></label>
           <input type="file" id="rep-capture-input" accept="image/*" style="display:none" onchange="previewUpload(event, 'rep-capture-preview', 'repCaptureData', false, 960, 0.92)" />
         </div>
-        <button class="btn-main" onclick="submitIssueReport()">📨 Enviar Reporte</button>
+        <button class="btn-main" id="btn-submit-report" onclick="submitIssueReport()">📨 Enviar Reporte</button>
       </div>
       <div class="panel-card"><h3 style="font-size:15px;margin-bottom:10px;">🔔 Mis Reportes</h3><div id="client-reports-list"></div></div>
     </section>
@@ -815,7 +812,7 @@
         </div>
 
         <div class="quick-nav" style="margin-bottom:14px;border-radius:12px;">
-          <button class="nav-tab active" onclick="switchAdminTab('adm-recargas', this)">🔔 Recargas</button>
+          <button class="nav-tab active" onclick="switchAdminTab('adm-recargas', this)">🔔 Recargas & Ventas</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-stock', this)">🔑 Stock</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-productos', this)">📦 Productos</button>
           <button class="nav-tab" onclick="switchAdminTab('adm-reportes', this)">🛠️ Reportes</button>
@@ -826,7 +823,7 @@
         </div>
 
         <div id="adm-recargas" class="adm-tab">
-          <h3 style="font-size:15px;margin-bottom:8px;color:#34d399;">📤 Ventas Recientes (Enviar por WhatsApp)</h3>
+          <h3 style="font-size:15px;margin-bottom:8px;color:#34d399;">📤 Ventas Recientes (Completar Manuales / WhatsApp)</h3>
           <div id="adm-recent-sales-list" style="margin-bottom:16px;"></div>
           <hr style="border-color:rgba(255,255,255,0.08);margin:14px 0;" />
           <h3 style="font-size:15px;margin-bottom:8px;">💰 Saldo a Clientes</h3>
@@ -852,7 +849,7 @@
         </div>
 
         <div id="adm-productos" class="adm-tab" style="display:none;">
-          <h3 style="font-size:15px;margin-bottom:10px;">📦 Crear Producto</h3>
+          <h3 style="font-size:15px;margin-bottom:10px;">📦 Crear / Editar Producto</h3>
           <input type="hidden" id="edit-prod-id" />
           <div class="field-group"><label>Nombre</label><input type="text" id="p-name" /></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
@@ -885,7 +882,10 @@
             <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;"><input type="checkbox" id="p-auto-delivery" checked onchange="toggleManualStockInput()" /> <b>⚡ Entrega automática</b></label>
             <div id="manual-stock-wrap" class="field-group" style="display:none;margin-top:6px;"><label>Cupos</label><input type="number" id="p-manual-stock" value="10" /></div>
           </div>
-          <button class="btn-main" onclick="adminSaveProduct()">💾 Guardar Producto</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-main" onclick="adminSaveProduct()">💾 Guardar Producto</button>
+            <button class="btn-outline" onclick="clearProductForm()">🧹 Limpiar</button>
+          </div>
           <div id="adm-products-list" style="margin-top:10px;"></div>
         </div>
 
@@ -954,6 +954,8 @@
             <div class="field-group" style="margin-top:10px;margin-bottom:0;"><label>O link .mp4</label><input type="text" id="cfg-bg-vid-url" placeholder="https://...mp4" /></div>
           </div>
 
+          <button type="button" class="btn-outline" style="width:100%;margin-bottom:12px;" onclick="resetBackgroundToParticles()">✨ Quitar imagen/video y usar fondo limpio</button>
+
           <div class="field-group"><label>Tienda</label><input type="text" id="cfg-store-name" /></div>
           <div class="field-group"><label>Eslogan</label><input type="text" id="cfg-store-slogan" /></div>
           <div class="field-group">
@@ -975,7 +977,7 @@
           <div id="adm-songs-list" style="margin-top:10px;"></div>
         </div>
 
-        <div id="adm-export" class="adm-tab" style="display:none;"><button class="btn-main" onclick="forcePushToCloud()">☁️ Sincronizar</button></div>
+        <div id="adm-export" class="adm-tab" style="display:none;"><button class="btn-main" onclick="forcePushToCloud()">☁️ Sincronizar Ahora</button></div>
       </div>
     </section>
   </main>
@@ -1078,6 +1080,22 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR / COMPLETAR ENTREGA MANUAL -->
+  <div class="modal-backdrop" id="modal-edit-sale" data-app="store">
+    <div class="modal-box">
+      <h3>✏️ Completar / Editar Entrega</h3>
+      <input type="hidden" id="edit-sale-id" />
+      <div class="field-group"><label>Correo</label><input type="text" id="edit-sale-email" /></div>
+      <div class="field-group"><label>Contraseña</label><input type="text" id="edit-sale-pass" /></div>
+      <div class="field-group"><label>Perfil / PIN / ID</label><input type="text" id="edit-sale-profile" /></div>
+      <div class="field-group"><label>Enlace de Códigos (opcional)</label><input type="text" id="edit-sale-codeurl" /></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-main" onclick="confirmEditSale()">💾 Guardar y Notificar</button>
+        <button class="btn-outline" onclick="closeModal('modal-edit-sale')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="modal-notifications" data-app="store">
     <div class="modal-box"><div style="display:flex;justify-content:space-between;margin-bottom:10px;"><h3>Notificaciones</h3><button class="btn-outline" onclick="closeModal('modal-notifications')">Cerrar</button></div><div id="notifications-list"></div></div>
   </div>
@@ -1086,6 +1104,7 @@
     <div class="modal-box">
       <h3 id="res-modal-title">Resolver falla</h3>
       <input type="hidden" id="res-report-id" />
+      <input type="hidden" id="res-pulled-acc-id" />
       <div class="field-group"><label>Tomar stock</label><div style="display:flex;gap:6px;"><select id="res-stock-prod" style="flex:1;"></select><button class="btn-outline" onclick="pullStockForResolution()">Tomar</button></div></div>
       <div class="field-group"><label>Correo</label><input type="text" id="res-new-email" /></div>
       <div class="field-group"><label>Contraseña</label><input type="text" id="res-new-pass" /></div>
@@ -1094,7 +1113,10 @@
         <label>Nota / Resolución para el cliente</label>
         <textarea id="res-custom-note" rows="2" placeholder="Ej. Se entregó cuenta de reposición o motivo de resolución..."></textarea>
       </div>
-      <div style="display:flex;gap:8px;"><button class="btn-main" onclick="confirmResolveReport()">Guardar resolución</button><button class="btn-outline" onclick="closeModal('modal-resolve-report')">Cancelar</button></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-main" onclick="confirmResolveReport()">Guardar resolución</button>
+        <button class="btn-outline" onclick="cancelResolveReport()">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -1108,9 +1130,18 @@
       el.innerText = msg || "✨ Se guardó con éxito";
       el.classList.add("show");
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.classList.remove("show"); }, 1150);
+      toastTimer = setTimeout(() => { el.classList.remove("show"); }, 1400);
     }
     window.alert = function(msg) { showPurpleToast(msg); };
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
     function openCaptureViewer(src, titleText) {
       if (!src) return;
@@ -1145,6 +1176,11 @@
         fallbackCopy(txt);
       }
     }
+    function copyFromBtn(btn) {
+      if (!btn) return;
+      const txt = btn.getAttribute("data-copy") || "";
+      copyText(txt);
+    }
     function fallbackCopy(txt) {
       const ta = document.createElement("textarea");
       ta.value = txt;
@@ -1167,6 +1203,23 @@
     let loadedVideoId = "";
     let wantVideoSound = true;
     let isSavingStock = false;
+    let isSavingToCloud = false;
+    let isExecutingPurchase = false;
+
+    function updateSyncIndicator(state) {
+      const mini = document.getElementById("sync-status-mini");
+      const banner = document.getElementById("firebase-status-banner");
+      if (state === "syncing") {
+        if (mini) { mini.innerText = "● Guardando..."; mini.style.color = "#f59e0b"; }
+        if (banner) { banner.innerText = "🟡 Sincronizando con Cloudflare..."; banner.style.color = "#f59e0b"; }
+      } else if (state === "error") {
+        if (mini) { mini.innerText = "● Sin conexión"; mini.style.color = "#ef4444"; }
+        if (banner) { banner.innerText = "🔴 Error de red (reintentando...)"; banner.style.color = "#ef4444"; }
+      } else {
+        if (mini) { mini.innerText = "● En línea 24/7"; mini.style.color = "#34d399"; }
+        if (banner) { banner.innerText = "🟢 Sincronizado en vivo (Cloudflare KV)"; banner.style.color = "#34d399"; }
+      }
+    }
 
     function handleWaBubbleClick(ev) {
       const digits = normalizePhoneForWA(STATE.waNumber || "");
@@ -1178,16 +1231,17 @@
       document.getElementById("wa-float-bubble").href = `https://wa.me/${digits}`;
     }
 
-    function handleBgImageGalleryUpload(event) {
+    async function handleBgImageGalleryUpload(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-      compressImageFile(file, 1080, 0.85, true, function(dataUrl) {
+      compressImageFile(file, 1080, 0.85, true, async function(dataUrl) {
+        await pullStateFromCloud(true);
         STATE.background.type = "image";
         STATE.background.dataUrl = dataUrl;
         STATE.background.videoId = "";
         const prev = document.getElementById("adm-bg-img-preview");
         if (prev) { prev.src = dataUrl; prev.style.display = "block"; }
-        saveState();
+        await saveState();
         showPurpleToast("✨ Imagen de fondo guardada");
       });
     }
@@ -1197,7 +1251,7 @@
       const chatId = (STATE.tgChatId || "").trim();
       if (!token || !chatId || token === "TU_TELEGRAM_BOT_TOKEN" || chatId === "TU_TELEGRAM_CHAT_ID") return;
       try {
-        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
         await fetch(url);
       } catch (e) {}
     }
@@ -1264,8 +1318,8 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById("bg-video-upload-status");
-      if (file.size > 22 * 1024 * 1024) { showPurpleToast("⚠️ Elige un video menor a 20 MB"); return; }
-      if (statusEl) statusEl.innerText = "⏳ Cargando video con música...";
+      if (file.size > 15 * 1024 * 1024) { showPurpleToast("⚠️ Elige un video menor a 15 MB"); return; }
+      if (statusEl) statusEl.innerText = "⏳ Subiendo video con música...";
       showPurpleToast("⏳ Subiendo video...");
 
       const reader = new FileReader();
@@ -1290,11 +1344,16 @@
         checkVideoHasAudio();
 
         try {
-          await fetch(CLOUD_VIDEO_URL, {
+          const vidRes = await fetch(CLOUD_VIDEO_URL, {
             method: "PUT", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: newVidId, dataUrl: videoDataUrl })
           });
-        } catch (err) {}
+          if (!vidRes.ok) throw new Error("Upload video error");
+        } catch (err) {
+          if (statusEl) statusEl.innerText = "⚠️ No se pudo subir el video a la nube";
+          showPurpleToast("⚠️ Error subiendo video");
+          return;
+        }
         await saveState();
         if (statusEl) statusEl.innerText = "✅ Video activo en vivo";
         showPurpleToast("✨ Se guardó con éxito");
@@ -1356,7 +1415,7 @@
     }
     hideNetlifyWidgetSafely();
     new MutationObserver(hideNetlifyWidgetSafely).observe(document.body, { childList: true });
-    setInterval(hideNetlifyWidgetSafely, 600);
+    setInterval(hideNetlifyWidgetSafely, 800);
 
     let MY_CLIENT_ID = localStorage.getItem(CLIENT_ID_KEY);
     if (!MY_CLIENT_ID) { MY_CLIENT_ID = "cli_" + Math.floor(100000 + Math.random() * 900000); localStorage.setItem(CLIENT_ID_KEY, MY_CLIENT_ID); }
@@ -1423,19 +1482,25 @@
 
     async function saveStockState() {
       isSavingStock = true;
+      updateSyncIndicator("syncing");
       saveLocalStockCache();
       try {
-        await fetch(CLOUD_STOCK_URL, {
+        const res = await fetch(CLOUD_STOCK_URL, {
           method: "PUT", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(accountsStock)
         });
-      } catch (e) {} finally {
+        updateSyncIndicator(res.ok ? "ok" : "error");
+        return res.ok;
+      } catch (e) {
+        updateSyncIndicator("error");
+        return false;
+      } finally {
         isSavingStock = false;
       }
     }
 
     async function pullStockFromCloud() {
-      if (isSavingStock) return;
+      if (isSavingStock) return accountsStock;
       try {
         const res = await fetch(CLOUD_STOCK_URL + "&t=" + Date.now(), { cache: "no-store" });
         if (res.ok) {
@@ -1446,12 +1511,14 @@
               saveLocalStockCache();
               renderAll();
             }
+            return cloudStock;
           }
         }
       } catch (e) {}
+      return accountsStock;
     }
 
-    let isAdmin = false; let currentCat = "all"; let pendingBuyProdId = null; let currentSongIdx = 0; let isSavingToCloud = false;
+    let isAdmin = false; let currentCat = "all"; let pendingBuyProdId = null; let currentSongIdx = 0;
     window.recCaptureData = ""; window.repCaptureData = ""; window.prodImgData = ""; window.catImgData = "";
 
     function ensureClientRecord(cid, alias) {
@@ -1486,24 +1553,51 @@
     }
     function saveLocalCache() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); } catch (e) {} }
 
-    async function saveState() { STATE.lastUpdated = Date.now(); saveLocalCache(); renderAll(); await pushStateToCloud(); }
+    async function saveState() {
+      STATE.lastUpdated = Date.now();
+      saveLocalCache();
+      renderAll();
+      await pushStateToCloud();
+    }
+
     async function pushStateToCloud() {
       isSavingToCloud = true;
-      try { await fetch(CLOUD_DB_URL, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(STATE) }); } catch (err) {} finally { isSavingToCloud = false; }
+      updateSyncIndicator("syncing");
+      try {
+        const res = await fetch(CLOUD_DB_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(STATE)
+        });
+        updateSyncIndicator(res.ok ? "ok" : "error");
+        return res.ok;
+      } catch (err) {
+        updateSyncIndicator("error");
+        return false;
+      } finally {
+        isSavingToCloud = false;
+      }
     }
-    async function pullStateFromCloud() {
-      if (isSavingToCloud) return;
+
+    async function pullStateFromCloud(forceApply = false) {
+      if (isSavingToCloud && !forceApply) return STATE;
       try {
         const res = await fetch(CLOUD_DB_URL + "&t=" + Date.now(), { cache: "no-store" });
         if (res.ok) {
           const cloudData = await res.json();
-          if (!cloudData) { await pushStateToCloud(); return; }
-          if (!STATE.lastUpdated || (cloudData.lastUpdated && cloudData.lastUpdated > STATE.lastUpdated)) {
-            STATE = normalizeState(cloudData); ensureClientRecord(MY_CLIENT_ID); saveLocalCache(); renderAll();
+          if (!cloudData) { await pushStateToCloud(); return STATE; }
+          if (forceApply || !STATE.lastUpdated || (cloudData.lastUpdated && cloudData.lastUpdated !== STATE.lastUpdated)) {
+            STATE = normalizeState(cloudData);
+            ensureClientRecord(MY_CLIENT_ID);
+            saveLocalCache();
+            renderAll();
           }
+          updateSyncIndicator("ok");
         }
       } catch (e) {}
+      return STATE;
     }
+
     function forcePushToCloud() {
       saveState().then(() => saveStockState()).then(() => showPurpleToast("✨ Todo sincronizado en vivo"));
     }
@@ -1511,19 +1605,40 @@
     function pushAdminNotification(text, linkId) {
       if (!Array.isArray(STATE.adminNotifications)) STATE.adminNotifications = [];
       STATE.adminNotifications.unshift({ text, linkId, date: new Date().toLocaleTimeString() });
+      updateNotifBadge();
+    }
+
+    function pushClientNotification(clientId, text) {
+      if (!clientId || !STATE.clients || !STATE.clients[clientId]) return;
+      if (!Array.isArray(STATE.clients[clientId].notifications)) STATE.clients[clientId].notifications = [];
+      STATE.clients[clientId].notifications.unshift({ text, date: new Date().toLocaleTimeString(), read: false });
+      updateNotifBadge();
+    }
+
+    function updateNotifBadge() {
       const badge = document.getElementById("notif-badge");
-      if (badge) {
-        badge.innerText = STATE.adminNotifications.length;
-        badge.style.display = "flex";
-      }
+      if (!badge) return;
+      const me = getMyClient();
+      const count = isAdmin
+        ? (STATE.adminNotifications || []).length
+        : (me.notifications || []).filter(n => !n.read).length;
+      badge.innerText = count;
+      badge.style.display = count > 0 ? "flex" : "none";
     }
 
     function openNotificationsModal() {
       const listEl = document.getElementById("notifications-list");
+      const me = getMyClient();
+      const items = isAdmin ? (STATE.adminNotifications || []) : (me.notifications || []);
+      if (!isAdmin && Array.isArray(me.notifications) && me.notifications.some(n => !n.read)) {
+        me.notifications.forEach(n => { n.read = true; });
+        updateNotifBadge();
+        saveState();
+      }
       if (listEl) {
-        listEl.innerHTML = (STATE.adminNotifications || []).length ? STATE.adminNotifications.map(n => `
+        listEl.innerHTML = items.length ? items.map(n => `
           <div style="background:rgba(255,255,255,0.05);padding:8px;border-radius:8px;margin-bottom:6px;font-size:12.5px;">
-            <div>${n.text}</div><div style="font-size:10px;color:var(--muted);">${n.date}</div>
+            <div>${escapeHtml(n.text)}</div><div style="font-size:10px;color:var(--muted);">${escapeHtml(n.date)}</div>
           </div>
         `).join("") : `<p style="font-size:12px;color:var(--muted);">Sin notificaciones.</p>`;
       }
@@ -1562,7 +1677,9 @@
       const pass = document.getElementById("reg-pass").value.trim();
       if (!username || !email || !phone || !pass) return showPurpleToast("✨ Llena los campos");
       const cleanPhone = normalizePhoneForWA(phone);
-      await pullStateFromCloud();
+      await pullStateFromCloud(true);
+      const exists = Object.values(STATE.clients || {}).some(c => c.registered && (c.email?.toLowerCase() === email || c.name?.toLowerCase() === username.toLowerCase()));
+      if (exists) return showPurpleToast("⚠️ Ese usuario o correo ya está registrado");
       const me = getMyClient();
       me.name = username; me.email = email; me.phone = cleanPhone; me.password = pass; me.registered = true;
       await saveState(); closeModal("modal-client-auth"); showPurpleToast("✨ Se guardó con éxito");
@@ -1572,7 +1689,7 @@
       const ident = document.getElementById("log-identifier").value.trim().toLowerCase();
       const pass = document.getElementById("log-pass").value.trim();
       if (!ident || !pass) return showPurpleToast("✨ Ingresa credenciales");
-      await pullStateFromCloud();
+      await pullStateFromCloud(true);
       const cleanIdentPhone = normalizePhoneForWA(ident);
       const found = Object.values(STATE.clients || {}).find(c => {
         if (!c.registered) return false;
@@ -1619,10 +1736,15 @@
     }
 
     function onProfilePicClick() { if (isAdmin) document.getElementById("quick-profile-input").click(); }
-    function handleQuickProfileUpload(event) {
+    async function handleQuickProfileUpload(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-      compressImageFile(file, 360, 0.85, true, function(dataUrl) { STATE.profilePic = dataUrl; saveState(); showPurpleToast("✨ Se guardó con éxito"); });
+      compressImageFile(file, 360, 0.85, true, async function(dataUrl) {
+        await pullStateFromCloud(true);
+        STATE.profilePic = dataUrl;
+        await saveState();
+        showPurpleToast("✨ Se guardó con éxito");
+      });
     }
 
     function previewColorsLive() {
@@ -1646,6 +1768,17 @@
       if (accEl) accEl.value = accentHex;
       previewColorsLive();
       showPurpleToast("🎨 Tono aplicado");
+    }
+
+    async function resetBackgroundToParticles() {
+      await pullStateFromCloud(true);
+      STATE.background = { type: "particles", dataUrl: "", videoId: "" };
+      document.getElementById("cfg-bg-img-url").value = "";
+      document.getElementById("cfg-bg-vid-url").value = "";
+      const bgImgPrev = document.getElementById("adm-bg-img-preview");
+      if (bgImgPrev) { bgImgPrev.src = ""; bgImgPrev.style.display = "none"; }
+      await saveState();
+      showPurpleToast("✨ Fondo limpio restaurado");
     }
 
     function applyThemeAndBackground() {
@@ -1690,10 +1823,12 @@
 
     function renderAll() {
       applyThemeAndBackground();
+      updateNotifBadge();
       const me = getMyClient();
       document.getElementById("drawer-user-name").innerText = me.registered ? me.name : "Invitado";
       document.getElementById("drawer-user-contact").innerText = me.registered ? `${me.email}` : "Toca para iniciar sesión";
       document.getElementById("drawer-user-balance").innerText = "$" + Number(me.balance || 0).toFixed(2);
+      document.getElementById("hero-edit-chip").style.display = isAdmin ? "block" : "none";
 
       if (me.registered && !document.getElementById("rec-client-name").value) {
         document.getElementById("rec-client-name").value = `${me.name} (${me.phone})`;
@@ -1718,7 +1853,7 @@
       document.getElementById("stat-entregadas").innerText = STATE.deliveredCount;
       document.getElementById("stat-combos").innerText = STATE.products.length;
 
-      document.getElementById("bank-info-box").innerHTML = (STATE.bankInfo || "").replace(/\n/g, "<br>");
+      document.getElementById("bank-info-box").innerHTML = escapeHtml(STATE.bankInfo || "").replace(/\n/g, "<br>");
       renderCategoriesBar(); renderCatalog(); renderPurchases(); renderClientReports();
       if (isAdmin) renderAdminPanels();
     }
@@ -1727,8 +1862,8 @@
       const bar = document.getElementById("categories-bar");
       bar.innerHTML = STATE.categories.map(cat => `
         <div class="cat-pill ${currentCat === cat.id ? 'active' : ''}" onclick="selectCategory('${cat.id}')">
-          ${cat.img ? `<img src="${cat.img}" alt="${cat.name}" />` : `<span>${cat.icon || '📁'}</span>`}
-          <span>${cat.name}</span>
+          ${cat.img ? `<img src="${cat.img}" alt="${escapeHtml(cat.name)}" />` : `<span>${escapeHtml(cat.icon || '📁')}</span>`}
+          <span>${escapeHtml(cat.name)}</span>
         </div>
       `).join("");
     }
@@ -1767,14 +1902,14 @@
           <div class="prod-card">
             <div class="prod-head">
               <span class="stock-badge" style="color:${statusColor}">${statusText}</span>
-              ${imgSrc ? `<img class="prod-img" src="${imgSrc}" alt="${prod.name}" />` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;">Sin imagen</div>`}
+              ${imgSrc ? `<img class="prod-img" src="${imgSrc}" alt="${escapeHtml(prod.name)}" />` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;">Sin imagen</div>`}
               <div class="delivery-type-badge">${prod.autoDelivery ? '⚡ Inmediata' : '✍️ Manual'}</div>
             </div>
             <div class="prod-body">
               <div class="prod-stock-mini">Stock: ${stk} disponibles</div>
-              <div class="prod-title">${prod.name}</div>
-              <div class="prod-desc">${prod.desc || ''}</div>
-              <div class="prod-warranty">🛡️ ${warrantyTxt}</div>
+              <div class="prod-title">${escapeHtml(prod.name)}</div>
+              <div class="prod-desc">${escapeHtml(prod.desc || '')}</div>
+              <div class="prod-warranty">🛡️ ${escapeHtml(warrantyTxt)}</div>
               <div class="prod-price">$${Number(prod.price).toFixed(2)}</div>
               <button class="btn-main" ${stk <= 0 ? 'disabled' : ''} onclick="openBuyModal('${prod.id}')">${stk <= 0 ? 'Sin Stock' : '🛒 Comprar'}</button>
               ${isAdmin ? `<div style="display:flex;gap:4px;margin-top:4px;"><button class="btn-outline" style="flex:1;padding:5px;font-size:11px;" onclick="adminLoadProductToEdit('${prod.id}')">✏️ Editar</button><label class="btn-outline" style="flex:1;padding:5px;font-size:11px;cursor:pointer;">📷 Foto<input type="file" accept="image/*" style="display:none" onchange="quickProdPhotoUpload(event, '${prod.id}')" /></label></div>` : ''}
@@ -1784,12 +1919,13 @@
       }).join("");
     }
 
-    function quickProdPhotoUpload(event, prodId) {
+    async function quickProdPhotoUpload(event, prodId) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-      compressImageFile(file, 600, 0.88, true, function(dataUrl) {
+      compressImageFile(file, 600, 0.88, true, async function(dataUrl) {
+        await pullStateFromCloud(true);
         const p = STATE.products.find(x => x.id === prodId);
-        if (p) { p.img = dataUrl; saveState(); showPurpleToast("✨ Se guardó con éxito"); }
+        if (p) { p.img = dataUrl; await saveState(); showPurpleToast("✨ Se guardó con éxito"); }
       });
     }
 
@@ -1798,6 +1934,7 @@
       if (pur.email) lines.push(`📧 *Correo:* ${pur.email}`);
       if (pur.pass) lines.push(`🔑 *Contraseña:* ${pur.pass}`);
       if (pur.profile) lines.push(`👤 *Perfil/PIN:* ${pur.profile}`);
+      if (pur.codeUrl && pur.codeUrl !== "TU_URL_DE_CODIGOS") lines.push(`🔗 *Códigos:* ${pur.codeUrl}`);
       if (pur.warranty) lines.push(`🛡️ *Garantía:* ${pur.warranty}`);
       if (pur.postBuyMsg) lines.push(``, `📝 *Instrucciones:*`, pur.postBuyMsg);
       return lines.join("\n");
@@ -1868,87 +2005,118 @@
     }
 
     async function executePurchase() {
-      const prod = STATE.products.find(p => p.id === pendingBuyProdId);
-      if (!prod) return;
-      const me = getMyClient();
-      if ((me.balance || 0) < prod.price) { closeModal("modal-buy-confirm"); showPurpleToast("💳 Saldo insuficiente"); switchView("recargar"); return; }
+      if (isExecutingPurchase) return;
+      const buyBtn = document.getElementById("buy-confirm-btn");
+      isExecutingPurchase = true;
+      if (buyBtn) { buyBtn.disabled = true; buyBtn.innerText = "⏳ Procesando..."; }
 
-      const clientEmail = document.getElementById("buy-client-email").value.trim();
-      const clientPass = document.getElementById("buy-client-pass").value.trim();
-      const clientId = document.getElementById("buy-client-id").value.trim();
-
-      if (prod.askEmail && !clientEmail) return showPurpleToast("📧 Ingresa tu correo");
-      if (prod.askPass && !clientPass) return showPurpleToast("🔑 Ingresa tu contraseña");
-      if (prod.askId && !clientId) return showPurpleToast("📌 Ingresa tu ID o perfil");
-
-      if (!Array.isArray(me.purchases)) me.purchases = [];
-      if (!Array.isArray(STATE.salesHistory)) STATE.salesHistory = [];
-      const warrantyTxt = prod.warranty || "25 días garantía (mayor en planes de más de 1 mes según tiempo)";
-      const postMsg = (prod.postBuyMsg && prod.postBuyMsg.trim() && prod.postBuyMsg !== "INSTRUCCIONES_POST_COMPRA")
-        ? `${prod.postBuyMsg.trim()}\n🛡️ Garantía: ${warrantyTxt}`
-        : `${STATE.defaultPostBuyMsg || ""}\n🛡️ Garantía: ${warrantyTxt}`;
-
-      if (prod.autoDelivery) {
-        try {
-          const res = await fetch(CLOUD_STOCK_URL + "&t=" + Date.now(), { cache: "no-store" });
-          if (res.ok) {
-            const freshStock = await res.json();
-            if (Array.isArray(freshStock)) {
-              accountsStock = freshStock;
-            }
-          }
-        } catch (e) {}
-
-        const freeAccIndex = accountsStock.findIndex(a => a.prodId === prod.id && !a.used);
-        if (freeAccIndex === -1) {
-          saveLocalStockCache();
-          renderAll();
+      try {
+        await pullStateFromCloud(true);
+        const prod = STATE.products.find(p => p.id === pendingBuyProdId);
+        if (!prod) return;
+        const me = getMyClient();
+        if ((me.balance || 0) < prod.price) {
           closeModal("modal-buy-confirm");
-          return showPurpleToast("⚠️ Lo sentimos, se acaba de agotar este producto");
+          showPurpleToast("💳 Saldo insuficiente");
+          switchView("recargar");
+          return;
         }
 
-        const freeAcc = accountsStock[freeAccIndex];
-        accountsStock[freeAccIndex].used = true;
-        accountsStock[freeAccIndex].usedBy = me.name;
-        accountsStock[freeAccIndex].usedDate = new Date().toLocaleString();
+        const clientEmail = document.getElementById("buy-client-email").value.trim();
+        const clientPass = document.getElementById("buy-client-pass").value.trim();
+        const clientId = document.getElementById("buy-client-id").value.trim();
 
-        await saveStockState();
+        if (prod.askEmail && !clientEmail) return showPurpleToast("📧 Ingresa tu correo");
+        if (prod.askPass && !clientPass) return showPurpleToast("🔑 Ingresa tu contraseña");
+        if (prod.askId && !clientId) return showPurpleToast("📌 Ingresa tu ID o perfil");
 
-        me.balance = Number(me.balance) - Number(prod.price);
-        STATE.deliveredCount = Number(STATE.deliveredCount || 0) + 1;
-        const purchaseRecord = {
-          id: "pur_" + Date.now(), prodId: prod.id, prodName: prod.name, clientId: MY_CLIENT_ID,
-          clientName: me.name, clientPhone: me.phone, date: new Date().toLocaleString(), type: "auto",
-          email: freeAcc.email, pass: freeAcc.pass, profile: freeAcc.profile, customId: freeAcc.customId || clientId,
-          codeUrl: freeAcc.codeUrl || STATE.defaultCodeUrl, warranty: warrantyTxt, postBuyMsg: postMsg, showEmail: prod.showEmail, showPass: prod.showPass, showProfile: prod.showProfile
-        };
-        me.purchases.unshift(purchaseRecord);
-        STATE.salesHistory.unshift(purchaseRecord);
-        pushAdminNotification(`🛒 Venta: ${prod.name} a ${me.name}`, purchaseRecord.id);
-        
-        sendTelegramNotification(`🛒 *¡NUEVA VENTA!*\n📦 ${prod.name}\n👤 ${me.name}\n💵 $${prod.price}`);
+        if (!Array.isArray(me.purchases)) me.purchases = [];
+        if (!Array.isArray(STATE.salesHistory)) STATE.salesHistory = [];
+        const warrantyTxt = prod.warranty || "25 días garantía (mayor en planes de más de 1 mes según tiempo)";
+        const postMsg = (prod.postBuyMsg && prod.postBuyMsg.trim() && prod.postBuyMsg !== "INSTRUCCIONES_POST_COMPRA")
+          ? `${prod.postBuyMsg.trim()}\n🛡️ Garantía: ${warrantyTxt}`
+          : `${STATE.defaultPostBuyMsg || ""}\n🛡️ Garantía: ${warrantyTxt}`;
 
-        closeModal("modal-buy-confirm"); showPurpleToast("✨ Compra exitosa");
-        showDeliveryModal(purchaseRecord);
-        dispatchAutomaticWhatsAppInBackground(purchaseRecord);
-        await saveState();
-      } else {
-        if (prod.manualStock <= 0) return showPurpleToast("⚠️ Sin cupos");
-        prod.manualStock -= 1; me.balance = Number(me.balance) - Number(prod.price);
-        STATE.deliveredCount = Number(STATE.deliveredCount || 0) + 1;
-        const purchaseRecord = {
-          id: "pur_" + Date.now(), prodId: prod.id, prodName: prod.name, clientId: MY_CLIENT_ID,
-          clientName: me.name, clientPhone: me.phone, date: new Date().toLocaleString(), type: "manual",
-          email: clientEmail || "En proceso", pass: clientPass || "Se vinculará", profile: clientId || "Activación en curso",
-          codeUrl: STATE.defaultCodeUrl, warranty: warrantyTxt, postBuyMsg: postMsg, showEmail: true, showPass: true, showProfile: true
-        };
-        me.purchases.unshift(purchaseRecord); STATE.salesHistory.unshift(purchaseRecord);
-        pushAdminNotification(`👑 Sincronización: ${prod.name} (${me.name})`, purchaseRecord.id);
+        if (prod.autoDelivery) {
+          await pullStockFromCloud();
 
-        sendTelegramNotification(`🛒 *¡NUEVA VENTA MANUAL!*\n📦 ${prod.name}\n👤 ${me.name}\n💵 $${prod.price}\n📧 Correo: ${clientEmail}\n🔑 Pass: ${clientPass}\n📌 ID: ${clientId}`);
+          const freeAccIndex = accountsStock.findIndex(a => a.prodId === prod.id && !a.used);
+          if (freeAccIndex === -1) {
+            saveLocalStockCache();
+            renderAll();
+            closeModal("modal-buy-confirm");
+            return showPurpleToast("⚠️ Lo sentimos, se acaba de agotar este producto");
+          }
 
-        await saveState(); closeModal("modal-buy-confirm"); showPurpleToast("✨ Se guardó con éxito");
-        showDeliveryModal(purchaseRecord);
+          const lockToken = MY_CLIENT_ID + "_" + Date.now() + "_" + Math.floor(Math.random() * 9999);
+          const targetAccId = accountsStock[freeAccIndex].id;
+          accountsStock[freeAccIndex].used = true;
+          accountsStock[freeAccIndex].lockToken = lockToken;
+          accountsStock[freeAccIndex].usedBy = me.name;
+          accountsStock[freeAccIndex].usedById = MY_CLIENT_ID;
+          accountsStock[freeAccIndex].usedDate = new Date().toLocaleString();
+
+          const savedOk = await saveStockState();
+          if (!savedOk) {
+            accountsStock[freeAccIndex].used = false;
+            delete accountsStock[freeAccIndex].lockToken;
+            saveLocalStockCache();
+            return showPurpleToast("⚠️ Error de red al apartar cuenta, intenta de nuevo");
+          }
+
+          await new Promise(r => setTimeout(r, 250));
+          const verifiedStock = await pullStockFromCloud();
+          const confirmedAcc = (verifiedStock || []).find(a => a.id === targetAccId);
+          if (!confirmedAcc || confirmedAcc.lockToken !== lockToken) {
+            renderAll();
+            closeModal("modal-buy-confirm");
+            return showPurpleToast("⚠️ Otro cliente tomó esa cuenta justo antes, intenta de nuevo");
+          }
+
+          me.balance = Number(me.balance) - Number(prod.price);
+          STATE.deliveredCount = Number(STATE.deliveredCount || 0) + 1;
+          const purchaseRecord = {
+            id: "pur_" + Date.now(), prodId: prod.id, prodName: prod.name, clientId: MY_CLIENT_ID,
+            clientName: me.name, clientPhone: me.phone, date: new Date().toLocaleString(), type: "auto",
+            email: confirmedAcc.email, pass: confirmedAcc.pass, profile: confirmedAcc.profile, customId: confirmedAcc.customId || clientId,
+            codeUrl: confirmedAcc.codeUrl || STATE.defaultCodeUrl, warranty: warrantyTxt, postBuyMsg: postMsg, showEmail: prod.showEmail, showPass: prod.showPass, showProfile: prod.showProfile
+          };
+          me.purchases.unshift(purchaseRecord);
+          STATE.salesHistory.unshift(purchaseRecord);
+          pushAdminNotification(`🛒 Venta: ${prod.name} a ${me.name}`, purchaseRecord.id);
+
+          await saveState();
+          sendTelegramNotification(`🛒 *¡NUEVA VENTA!*\n📦 ${prod.name}\n👤 ${me.name}\n💵 $${prod.price}`);
+
+          closeModal("modal-buy-confirm");
+          showPurpleToast("✨ Compra exitosa");
+          showDeliveryModal(purchaseRecord);
+          dispatchAutomaticWhatsAppInBackground(purchaseRecord);
+        } else {
+          if (prod.manualStock <= 0) return showPurpleToast("⚠️ Sin cupos");
+          prod.manualStock -= 1;
+          me.balance = Number(me.balance) - Number(prod.price);
+          STATE.deliveredCount = Number(STATE.deliveredCount || 0) + 1;
+          const purchaseRecord = {
+            id: "pur_" + Date.now(), prodId: prod.id, prodName: prod.name, clientId: MY_CLIENT_ID,
+            clientName: me.name, clientPhone: me.phone, date: new Date().toLocaleString(), type: "manual",
+            email: clientEmail || "En proceso", pass: clientPass || "Se vinculará", profile: clientId || "Activación en curso",
+            codeUrl: STATE.defaultCodeUrl, warranty: warrantyTxt, postBuyMsg: postMsg, showEmail: true, showPass: true, showProfile: true
+          };
+          me.purchases.unshift(purchaseRecord);
+          STATE.salesHistory.unshift(purchaseRecord);
+          pushAdminNotification(`👑 Sincronización manual: ${prod.name} (${me.name})`, purchaseRecord.id);
+
+          await saveState();
+          sendTelegramNotification(`🛒 *¡NUEVA VENTA MANUAL!*\n📦 ${prod.name}\n👤 ${me.name}\n💵 $${prod.price}\n📧 Correo: ${clientEmail}\n🔑 Pass: ${clientPass}\n📌 ID: ${clientId}`);
+
+          closeModal("modal-buy-confirm");
+          showPurpleToast("✨ Se guardó con éxito");
+          showDeliveryModal(purchaseRecord);
+        }
+      } finally {
+        isExecutingPurchase = false;
+        if (buyBtn) { buyBtn.disabled = false; buyBtn.innerText = "Comprar"; }
       }
     }
 
@@ -1956,9 +2124,15 @@
       document.getElementById("deliv-title").innerText = "🎉 " + pur.prodName;
       const box = document.getElementById("deliv-fields-container");
       let html = "";
-      if (pur.email) html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">CORREO</div><div class="copy-row-val">${pur.email}</div></div><button class="copy-btn" onclick="copyText('${pur.email}')">Copiar</button></div>`;
-      if (pur.pass) html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">CONTRASEÑA</div><div class="copy-row-val">${pur.pass}</div></div><button class="copy-btn" onclick="copyText('${pur.pass}')">Copiar</button></div>`;
-      if (pur.profile) html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">PERFIL / ID</div><div class="copy-row-val">${pur.profile}</div></div><button class="copy-btn" onclick="copyText('${pur.profile}')">Copiar</button></div>`;
+      if (pur.email) {
+        html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">CORREO</div><div class="copy-row-val">${escapeHtml(pur.email)}</div></div><button class="copy-btn" data-copy="${escapeHtml(pur.email)}" onclick="copyFromBtn(this)">Copiar</button></div>`;
+      }
+      if (pur.pass) {
+        html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">CONTRASEÑA</div><div class="copy-row-val">${escapeHtml(pur.pass)}</div></div><button class="copy-btn" data-copy="${escapeHtml(pur.pass)}" onclick="copyFromBtn(this)">Copiar</button></div>`;
+      }
+      if (pur.profile) {
+        html += `<div class="copy-row"><div><div style="font-size:10px;color:var(--muted);">PERFIL / ID</div><div class="copy-row-val">${escapeHtml(pur.profile)}</div></div><button class="copy-btn" data-copy="${escapeHtml(pur.profile)}" onclick="copyFromBtn(this)">Copiar</button></div>`;
+      }
       box.innerHTML = html;
 
       const codeWrap = document.getElementById("deliv-codeurl-wrap");
@@ -1989,7 +2163,7 @@
       list.innerHTML = myPurchases.map(p => `
         <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div><b>${p.prodName}</b><div style="font-size:11px;color:var(--muted);">${p.date}</div></div>
+            <div><b>${escapeHtml(p.prodName)}</b><div style="font-size:11px;color:var(--muted);">${escapeHtml(p.date)}</div></div>
             <button class="btn-main" style="width:auto;padding:6px 10px;" onclick='showDeliveryById("${p.id}")'>Ver Cuenta</button>
           </div>
         </div>
@@ -2005,18 +2179,27 @@
       const amount = Number(document.getElementById("rec-amount").value);
       if (!amount || amount <= 0) return showPurpleToast("💳 Ingresa monto");
       if (!window.recCaptureData) return showPurpleToast("📸 Sube captura");
-      await pullStateFromCloud();
-      const req = { id: "rec_" + Date.now(), clientId: MY_CLIENT_ID, clientName: `${me.name} | ${me.phone}`, amount, refCode: document.getElementById("recharge-ref-code").innerText, capture: window.recCaptureData, status: "Pendiente", date: new Date().toLocaleString() };
-      STATE.rechargeRequests.unshift(req);
-      pushAdminNotification(`💳 Recarga de ${me.name} por $${amount}`);
-      notifyAdminRechargeOnWhatsApp(req);
 
-      sendTelegramNotification(`💳 *¡NUEVA RECARGA!*\n👤 ${me.name}\n💰 $${amount}\nRef: ${req.refCode}`);
+      const btn = document.getElementById("btn-submit-recharge");
+      if (btn) btn.disabled = true;
+      try {
+        await pullStateFromCloud(true);
+        const req = { id: "rec_" + Date.now(), clientId: MY_CLIENT_ID, clientName: `${me.name} | ${me.phone}`, amount, refCode: document.getElementById("recharge-ref-code").innerText, capture: window.recCaptureData, status: "Pendiente", date: new Date().toLocaleString() };
+        STATE.rechargeRequests.unshift(req);
+        pushAdminNotification(`💳 Recarga de ${me.name} por $${amount}`);
+        notifyAdminRechargeOnWhatsApp(req);
 
-      window.recCaptureData = ""; document.getElementById("rec-amount").value = "";
-      const recPrev = document.getElementById("rec-capture-preview");
-      if (recPrev) { recPrev.src = ""; recPrev.style.display = "none"; }
-      generateNewRefCode(); await saveState(); showPurpleToast("✨ Se guardó con éxito");
+        sendTelegramNotification(`💳 *¡NUEVA RECARGA!*\n👤 ${me.name}\n💰 $${amount}\nRef: ${req.refCode}`);
+
+        window.recCaptureData = ""; document.getElementById("rec-amount").value = "";
+        const recPrev = document.getElementById("rec-capture-preview");
+        if (recPrev) { recPrev.src = ""; recPrev.style.display = "none"; }
+        generateNewRefCode();
+        await saveState();
+        showPurpleToast("✨ Recarga enviada");
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     async function submitIssueReport() {
@@ -2029,51 +2212,58 @@
       const desc = document.getElementById("rep-desc").value.trim();
 
       if (!plat || !desc) return showPurpleToast("⚠️ Llena plataforma y problema");
-      await pullStateFromCloud();
+      const btn = document.getElementById("btn-submit-report");
+      if (btn) btn.disabled = true;
 
-      const newRep = {
-        id: "rep_" + Date.now(),
-        clientId: MY_CLIENT_ID,
-        clientName: getMyClient().name,
-        type: "falla",
-        platform: plat,
-        repEmail,
-        repPass,
-        repProfile,
-        purchaseDate,
-        reportDate,
-        desc,
-        capture: window.repCaptureData || "",
-        policyMsg: REPORT_POLICY_MSG,
-        status: "Pendiente",
-        date: new Date().toLocaleString()
-      };
-      STATE.reports.unshift(newRep);
+      try {
+        await pullStateFromCloud(true);
+        const newRep = {
+          id: "rep_" + Date.now(),
+          clientId: MY_CLIENT_ID,
+          clientName: getMyClient().name,
+          type: "falla",
+          platform: plat,
+          repEmail,
+          repPass,
+          repProfile,
+          purchaseDate,
+          reportDate,
+          desc,
+          capture: window.repCaptureData || "",
+          policyMsg: REPORT_POLICY_MSG,
+          status: "Pendiente",
+          date: new Date().toLocaleString()
+        };
+        STATE.reports.unshift(newRep);
+        pushAdminNotification(`⚠️ Reporte de falla: ${plat} (${getMyClient().name})`);
 
-      sendTelegramNotification(
-        `⚠️ *¡REPORTE DE FALLA!*\n` +
-        `📱 Plataforma: ${plat}\n` +
-        `👤 Cliente: ${getMyClient().name}\n` +
-        `📧 Correo: ${repEmail || "No indicado"}\n` +
-        `🔑 Contraseña: ${repPass || "No indicada"}\n` +
-        `👤 Perfil: ${repProfile || "No indicado"}\n` +
-        `🛒 Día de compra: ${purchaseDate}\n` +
-        `📅 Día de reporte: ${reportDate}\n` +
-        `📝 Problema: ${desc}`
-      );
+        sendTelegramNotification(
+          `⚠️ *¡REPORTE DE FALLA!*\n` +
+          `📱 Plataforma: ${plat}\n` +
+          `👤 Cliente: ${getMyClient().name}\n` +
+          `📧 Correo: ${repEmail || "No indicado"}\n` +
+          `🔑 Contraseña: ${repPass || "No indicada"}\n` +
+          `👤 Perfil: ${repProfile || "No indicado"}\n` +
+          `🛒 Día de compra: ${purchaseDate}\n` +
+          `📅 Día de reporte: ${reportDate}\n` +
+          `📝 Problema: ${desc}`
+        );
 
-      window.repCaptureData = "";
-      document.getElementById("rep-platform").value = "";
-      document.getElementById("rep-email").value = "";
-      document.getElementById("rep-pass").value = "";
-      document.getElementById("rep-profile").value = "";
-      document.getElementById("rep-purchase-date").value = "";
-      document.getElementById("rep-desc").value = "";
-      const repPrev = document.getElementById("rep-capture-preview");
-      if (repPrev) { repPrev.src = ""; repPrev.style.display = "none"; }
+        window.repCaptureData = "";
+        document.getElementById("rep-platform").value = "";
+        document.getElementById("rep-email").value = "";
+        document.getElementById("rep-pass").value = "";
+        document.getElementById("rep-profile").value = "";
+        document.getElementById("rep-purchase-date").value = "";
+        document.getElementById("rep-desc").value = "";
+        const repPrev = document.getElementById("rep-capture-preview");
+        if (repPrev) { repPrev.src = ""; repPrev.style.display = "none"; }
 
-      await saveState();
-      showPurpleToast("✨ Reporte enviado");
+        await saveState();
+        showPurpleToast("✨ Reporte enviado");
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     function renderClientReports() {
@@ -2083,17 +2273,17 @@
         const policyText = r.policyMsg || REPORT_POLICY_MSG;
         return `
           <div style="background:rgba(255,255,255,0.04);padding:10px;border-radius:10px;margin-bottom:8px;font-size:12.5px;line-height:1.4;">
-            <div><b>${r.platform}</b> - <span style="color:${r.status === 'Resuelto' ? '#34d399' : '#f59e0b'}">${r.status}</span></div>
-            ${r.repEmail ? `<div style="font-size:11.5px;color:#cbd5e1;">📧 Correo: ${r.repEmail}</div>` : ''}
-            ${r.repPass ? `<div style="font-size:11.5px;color:#cbd5e1;">🔑 Contraseña: ${r.repPass}</div>` : ''}
-            ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${r.repProfile}</div>` : ''}
-            <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Día de compra: ${r.purchaseDate || "No especificado"} • 📅 Día de reporte: ${r.reportDate || r.date}</div>
-            <div style="color:var(--muted);margin-top:4px;">${r.desc}</div>
+            <div><b>${escapeHtml(r.platform)}</b> - <span style="color:${r.status === 'Resuelto' ? '#34d399' : '#f59e0b'}">${escapeHtml(r.status)}</span></div>
+            ${r.repEmail ? `<div style="font-size:11.5px;color:#cbd5e1;">📧 Correo: ${escapeHtml(r.repEmail)}</div>` : ''}
+            ${r.repPass ? `<div style="font-size:11.5px;color:#cbd5e1;">🔑 Contraseña: ${escapeHtml(r.repPass)}</div>` : ''}
+            ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${escapeHtml(r.repProfile)}</div>` : ''}
+            <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Día de compra: ${escapeHtml(r.purchaseDate || "No especificado")} • 📅 Día de reporte: ${escapeHtml(r.reportDate || r.date)}</div>
+            <div style="color:var(--muted);margin-top:4px;">${escapeHtml(r.desc)}</div>
             ${r.capture ? `<img src="${r.capture}" class="capture-thumb" onclick="openReportCaptureById('${r.id}')" title="Toca para ver de cerca" />` : ''}
             <div style="margin-top:6px;padding:8px;background:rgba(245,158,11,0.1);border-radius:8px;color:#fde68a;font-size:11.5px;">
-              <b>📌 Aviso del reporte:</b> ${policyText}
+              <b>📌 Aviso del reporte:</b> ${escapeHtml(policyText)}
             </div>
-            ${r.resolution ? `<div style="margin-top:6px;padding:8px;background:rgba(16,185,129,0.12);border-radius:8px;color:#a7f3d0;"><b>✅ Resolución:</b><br>${r.resolution}</div>` : ''}
+            ${r.resolution ? `<div style="margin-top:6px;padding:8px;background:rgba(16,185,129,0.12);border-radius:8px;color:#a7f3d0;"><b>✅ Resolución:</b><br>${escapeHtml(r.resolution)}</div>` : ''}
           </div>
         `;
       }).join("") : `<p style="color:var(--muted);">Sin reportes.</p>`;
@@ -2116,10 +2306,10 @@
     }
 
     function renderAdminPanels() {
-      document.getElementById("stk-prod-id").innerHTML = STATE.products.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
+      document.getElementById("stk-prod-id").innerHTML = STATE.products.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("res-stock-prod").innerHTML = document.getElementById("stk-prod-id").innerHTML;
-      document.getElementById("p-cat").innerHTML = STATE.categories.filter(c => c.id !== "all").map(c => `<option value="${c.id}">${c.name}</option>`).join("");
-      document.getElementById("adm-target-client").innerHTML = Object.values(STATE.clients || {}).map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+      document.getElementById("p-cat").innerHTML = STATE.categories.filter(c => c.id !== "all").map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+      document.getElementById("adm-target-client").innerHTML = Object.values(STATE.clients || {}).map(c => `<option value="${c.id}">${escapeHtml(c.name)} ($${Number(c.balance || 0).toFixed(2)})</option>`).join("");
 
       document.getElementById("cfg-color-purple").value = STATE.colors.purpleAccent || "#7c3aed";
       document.getElementById("cfg-color-accent").value = STATE.colors.accent || "#7c4dff";
@@ -2135,8 +2325,8 @@
       document.getElementById("cfg-tg-chat-id").value = STATE.tgChatId || "";
       document.getElementById("cfg-wa-api-instance").value = STATE.waApiInstance || "";
       document.getElementById("cfg-wa-api-token").value = STATE.waApiToken || "";
-      document.getElementById("cfg-bg-img-url").value = (STATE.background && STATE.background.type === "image" && STATE.background.dataUrl) ? STATE.background.dataUrl : "";
-      document.getElementById("cfg-bg-vid-url").value = (STATE.background && STATE.background.type === "video" && STATE.background.dataUrl) ? STATE.background.dataUrl : "";
+      document.getElementById("cfg-bg-img-url").value = (STATE.background && STATE.background.type === "image" && STATE.background.dataUrl && !STATE.background.dataUrl.startsWith("data:")) ? STATE.background.dataUrl : "";
+      document.getElementById("cfg-bg-vid-url").value = (STATE.background && STATE.background.type === "video" && STATE.background.dataUrl && !STATE.background.dataUrl.startsWith("data:")) ? STATE.background.dataUrl : "";
 
       const bgImgPrev = document.getElementById("adm-bg-img-preview");
       if (bgImgPrev && STATE.background && STATE.background.type === "image" && STATE.background.dataUrl) {
@@ -2144,16 +2334,22 @@
         bgImgPrev.style.display = "block";
       }
 
-      document.getElementById("adm-recent-sales-list").innerHTML = (STATE.salesHistory || []).length ? STATE.salesHistory.slice(0, 10).map(s => `
-        <div style="background:rgba(16,185,129,0.08);padding:8px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-          <div><b>${s.prodName}</b> - ${s.clientName}</div>
-          <button class="btn-main" style="width:auto;padding:5px 10px;background:#10b981;" onclick="adminSendWhatsAppBySaleId('${s.id}')">📲 WhatsApp</button>
+      document.getElementById("adm-recent-sales-list").innerHTML = (STATE.salesHistory || []).length ? STATE.salesHistory.slice(0, 15).map(s => `
+        <div style="background:rgba(16,185,129,0.08);padding:8px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+          <div style="font-size:12px;">
+            <b>${escapeHtml(s.prodName)}</b> - ${escapeHtml(s.clientName)}
+            <div style="font-size:10.5px;color:var(--muted);">${escapeHtml(s.email || '')} ${s.type === 'manual' ? '• ✍️ Manual' : '• ⚡ Auto'}</div>
+          </div>
+          <div style="display:flex;gap:5px;">
+            <button class="btn-outline" style="padding:5px 8px;font-size:11px;" onclick="openEditSaleModal('${s.id}')">✏️ Editar</button>
+            <button class="btn-main" style="width:auto;padding:5px 10px;background:#10b981;" onclick="adminSendWhatsAppBySaleId('${s.id}')">📲 WhatsApp</button>
+          </div>
         </div>
       `).join("") : `<p style="font-size:12px;color:var(--muted);">Sin ventas.</p>`;
 
       document.getElementById("adm-recharges-list").innerHTML = STATE.rechargeRequests.map(r => `
         <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-bottom:8px;">
-          <div><b>${r.clientName}</b> - $${r.amount} (${r.status})</div>
+          <div><b>${escapeHtml(r.clientName)}</b> - $${r.amount} (${escapeHtml(r.status)})</div>
           ${r.capture ? `
             <img src="${r.capture}" class="capture-thumb" onclick="openRechargeCaptureById('${r.id}')" title="Toca para ver de cerca" />
             <button class="btn-outline" style="padding:5px 10px;font-size:11.5px;margin-top:4px;" onclick="openRechargeCaptureById('${r.id}')">🔍 Ver comprobante de cerca</button>
@@ -2165,27 +2361,27 @@
       document.getElementById("adm-stock-list").innerHTML = accountsStock.map(a => {
         const prodObj = STATE.products.find(p => p.id === a.prodId);
         const prodLabel = prodObj ? prodObj.name : "Producto";
-        const statusLbl = a.used ? `<span style="color:#ef4444;font-weight:bold;">(Vendida)</span>` : `<span style="color:#10b981;font-weight:bold;">(Disponible)</span>`;
-        return `<div class="copy-row"><div><b>${prodLabel}</b> ${statusLbl}<div style="font-size:11.5px;color:#cbd5e1;">${a.email}</div></div><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteStock('${a.id}')">🗑️</button></div>`;
+        const statusLbl = a.used ? `<span style="color:#ef4444;font-weight:bold;">(Vendida${a.usedBy ? ' a ' + escapeHtml(a.usedBy) : ''})</span>` : `<span style="color:#10b981;font-weight:bold;">(Disponible)</span>`;
+        return `<div class="copy-row"><div><b>${escapeHtml(prodLabel)}</b> ${statusLbl}<div style="font-size:11.5px;color:#cbd5e1;">${escapeHtml(a.email)}</div></div><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteStock('${a.id}')">🗑️</button></div>`;
       }).join("");
 
       document.getElementById("adm-products-list").innerHTML = STATE.products.map(p => `
-        <div class="copy-row"><span>${p.name}</span><div style="display:flex;gap:4px;"><button class="btn-outline" onclick="adminLoadProductToEdit('${p.id}')">✏️</button><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteProduct('${p.id}')">🗑️</button></div></div>
+        <div class="copy-row"><span>${escapeHtml(p.name)} ($${p.price})</span><div style="display:flex;gap:4px;"><button class="btn-outline" onclick="adminLoadProductToEdit('${p.id}')">✏️</button><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteProduct('${p.id}')">🗑️</button></div></div>
       `).join("");
 
       document.getElementById("adm-reports-list").innerHTML = STATE.reports.length ? STATE.reports.map(r => `
         <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-bottom:8px;font-size:12.5px;line-height:1.4;">
-          <div><b>${r.platform}</b> - ${r.clientName} (${r.status})</div>
-          ${r.repEmail ? `<div style="font-size:11.5px;color:#cbd5e1;">📧 Correo: ${r.repEmail}</div>` : ''}
-          ${r.repPass ? `<div style="font-size:11.5px;color:#cbd5e1;">🔑 Contraseña: ${r.repPass}</div>` : ''}
-          ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${r.repProfile}</div>` : ''}
-          <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Compra: ${r.purchaseDate || "No especificado"} • 📅 Reporte: ${r.reportDate || r.date}</div>
-          <div style="color:var(--muted);margin:4px 0;">${r.desc}</div>
+          <div><b>${escapeHtml(r.platform)}</b> - ${escapeHtml(r.clientName)} (${escapeHtml(r.status)})</div>
+          ${r.repEmail ? `<div style="font-size:11.5px;color:#cbd5e1;">📧 Correo: ${escapeHtml(r.repEmail)}</div>` : ''}
+          ${r.repPass ? `<div style="font-size:11.5px;color:#cbd5e1;">🔑 Contraseña: ${escapeHtml(r.repPass)}</div>` : ''}
+          ${r.repProfile ? `<div style="font-size:11.5px;color:#cbd5e1;">👤 Perfil: ${escapeHtml(r.repProfile)}</div>` : ''}
+          <div style="font-size:11.5px;color:var(--secondary);margin-top:3px;">🛒 Compra: ${escapeHtml(r.purchaseDate || "No especificado")} • 📅 Reporte: ${escapeHtml(r.reportDate || r.date)}</div>
+          <div style="color:var(--muted);margin:4px 0;">${escapeHtml(r.desc)}</div>
           ${r.capture ? `
             <img src="${r.capture}" class="capture-thumb" onclick="openReportCaptureById('${r.id}')" title="Toca para ver de cerca" />
             <button class="btn-outline" style="padding:5px 10px;font-size:11.5px;margin-top:4px;" onclick="openReportCaptureById('${r.id}')">🔍 Ver captura de cerca</button>
           ` : ''}
-          ${r.resolution ? `<div style="color:#34d399;margin:4px 0;font-size:11.5px;"><b>Resolución:</b> ${r.resolution}</div>` : ''}
+          ${r.resolution ? `<div style="color:#34d399;margin:4px 0;font-size:11.5px;"><b>Resolución:</b> ${escapeHtml(r.resolution)}</div>` : ''}
           <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
             <button class="btn-main" style="width:auto;padding:6px 10px;" onclick="openResolveReportModal('${r.id}', false)">🛠️ Resolver falla</button>
             <button class="btn-outline" style="padding:6px 10px;" onclick="openResolveReportModal('${r.id}', true)">✏️ Editar</button>
@@ -2194,17 +2390,56 @@
       `).join("") : `<p style="font-size:12px;color:var(--muted);">Sin reportes pendientes.</p>`;
 
       document.getElementById("adm-cats-list").innerHTML = STATE.categories.filter(c => c.id !== "all").map(c => `
-        <div class="copy-row"><span>${c.icon || '📁'} ${c.name}</span><div style="display:flex;gap:4px;"><button class="btn-outline" onclick="adminLoadCategoryToEdit('${c.id}')">✏️</button><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteCategory('${c.id}')">🗑️</button></div></div>
+        <div class="copy-row"><span>${escapeHtml(c.icon || '📁')} ${escapeHtml(c.name)}</span><div style="display:flex;gap:4px;"><button class="btn-outline" onclick="adminLoadCategoryToEdit('${c.id}')">✏️</button><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteCategory('${c.id}')">🗑️</button></div></div>
       `).join("");
 
       document.getElementById("adm-songs-list").innerHTML = (STATE.songs || []).length ? STATE.songs.map((s, idx) => `
-        <div class="copy-row"><span>🎵 ${s.title}</span><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteSong(${idx})">🗑️</button></div>
+        <div class="copy-row"><span>🎵 ${escapeHtml(s.title)}</span><button class="btn-outline" style="color:#ef4444;" onclick="adminDeleteSong(${idx})">🗑️</button></div>
       `).join("") : `<p style="font-size:12px;color:var(--muted);">Sin canciones.</p>`;
+    }
+
+    function openEditSaleModal(saleId) {
+      const s = (STATE.salesHistory || []).find(x => x.id === saleId);
+      if (!s) return;
+      document.getElementById("edit-sale-id").value = s.id;
+      document.getElementById("edit-sale-email").value = s.email || "";
+      document.getElementById("edit-sale-pass").value = s.pass || "";
+      document.getElementById("edit-sale-profile").value = s.profile || "";
+      document.getElementById("edit-sale-codeurl").value = s.codeUrl || "";
+      openModal("modal-edit-sale");
+    }
+
+    async function confirmEditSale() {
+      const saleId = document.getElementById("edit-sale-id").value;
+      await pullStateFromCloud(true);
+      const s = (STATE.salesHistory || []).find(x => x.id === saleId);
+      if (!s) return;
+
+      s.email = document.getElementById("edit-sale-email").value.trim();
+      s.pass = document.getElementById("edit-sale-pass").value.trim();
+      s.profile = document.getElementById("edit-sale-profile").value.trim();
+      s.codeUrl = document.getElementById("edit-sale-codeurl").value.trim();
+
+      if (s.clientId && STATE.clients && STATE.clients[s.clientId]) {
+        const clientPur = (STATE.clients[s.clientId].purchases || []).find(p => p.id === saleId);
+        if (clientPur) {
+          clientPur.email = s.email;
+          clientPur.pass = s.pass;
+          clientPur.profile = s.profile;
+          clientPur.codeUrl = s.codeUrl;
+        }
+        pushClientNotification(s.clientId, `📦 Tu pedido "${s.prodName}" ya fue actualizado/entregado.`);
+      }
+
+      await saveState();
+      closeModal("modal-edit-sale");
+      showPurpleToast("✨ Entrega actualizada");
     }
 
     function openResolveReportModal(repId, isEdit = false) {
       const r = STATE.reports.find(x => x.id === repId);
       document.getElementById("res-report-id").value = repId;
+      document.getElementById("res-pulled-acc-id").value = "";
       document.getElementById("res-modal-title").innerText = isEdit ? "✏️ Editar resolución de falla" : "🛠️ Resolver falla";
       document.getElementById("res-new-email").value = r && r.resEmail ? r.resEmail : (r && r.repEmail ? r.repEmail : "");
       document.getElementById("res-new-pass").value = r && r.resPass ? r.resPass : (r && r.repPass ? r.repPass : "");
@@ -2215,9 +2450,13 @@
 
     async function pullStockForResolution() {
       const prodId = document.getElementById("res-stock-prod").value;
+      await pullStockFromCloud();
       const freeAcc = accountsStock.find(a => a.prodId === prodId && !a.used);
       if (!freeAcc) return showPurpleToast("⚠️ No hay stock libre para ese producto");
       freeAcc.used = true;
+      freeAcc.usedBy = "Reposición reporte";
+      freeAcc.usedDate = new Date().toLocaleString();
+      document.getElementById("res-pulled-acc-id").value = freeAcc.id;
       await saveStockState();
       document.getElementById("res-new-email").value = freeAcc.email;
       document.getElementById("res-new-pass").value = freeAcc.pass;
@@ -2226,8 +2465,25 @@
       showPurpleToast("🔑 Cuenta tomada del stock");
     }
 
+    async function cancelResolveReport() {
+      const pulledId = document.getElementById("res-pulled-acc-id").value;
+      if (pulledId) {
+        await pullStockFromCloud();
+        const acc = accountsStock.find(a => a.id === pulledId);
+        if (acc) {
+          acc.used = false;
+          delete acc.usedBy;
+          delete acc.usedDate;
+          await saveStockState();
+          renderAll();
+        }
+      }
+      closeModal("modal-resolve-report");
+    }
+
     async function confirmResolveReport() {
       const repId = document.getElementById("res-report-id").value;
+      await pullStateFromCloud(true);
       const r = STATE.reports.find(x => x.id === repId);
       if (!r) return;
       const email = document.getElementById("res-new-email").value.trim();
@@ -2249,27 +2505,40 @@
       if (note) parts.push(`Detalle: ${note}`);
       r.resolution = parts.length ? parts.join(" | ") : "Reporte atendido y cerrado.";
 
+      if (r.clientId) {
+        pushClientNotification(r.clientId, `✅ Tu reporte de ${r.platform} fue resuelto.`);
+      }
+
+      document.getElementById("res-pulled-acc-id").value = "";
       await saveState();
       closeModal("modal-resolve-report");
       showPurpleToast("✨ Falla resuelta");
     }
 
     async function adminApproveRecharge(reqId) {
+      await pullStateFromCloud(true);
       const r = STATE.rechargeRequests.find(x => x.id === reqId);
-      if (!r) return; r.status = "Aprobada";
-      ensureClientRecord(r.clientId || MY_CLIENT_ID, r.clientName).balance += Number(r.amount);
-      await saveState(); showPurpleToast("✨ Recarga aprobada");
+      if (!r || r.status === "Aprobada") return;
+      r.status = "Aprobada";
+      const targetCid = r.clientId || MY_CLIENT_ID;
+      ensureClientRecord(targetCid, r.clientName).balance += Number(r.amount);
+      pushClientNotification(targetCid, `💰 Tu recarga de $${r.amount} fue aprobada.`);
+      await saveState();
+      showPurpleToast("✨ Recarga aprobada");
     }
 
     async function adminAddBalance(isSum) {
       const clientId = document.getElementById("adm-target-client").value;
       const amt = Number(document.getElementById("adm-manual-bal").value);
       if (!clientId || isNaN(amt)) return showPurpleToast("⚠️ Datos incompletos");
+      await pullStateFromCloud(true);
       const client = STATE.clients[clientId];
       if (!client) return showPurpleToast("⚠️ Cliente no encontrado");
       if (isSum) client.balance = Number(client.balance || 0) + amt;
       else client.balance = amt;
-      await saveState(); showPurpleToast("✨ Saldo actualizado");
+      pushClientNotification(clientId, `💰 Saldo actualizado: $${Number(client.balance).toFixed(2)}`);
+      await saveState();
+      showPurpleToast("✨ Saldo actualizado");
     }
 
     async function adminAddAccountStock() {
@@ -2282,7 +2551,7 @@
       if (!email) return showPurpleToast("📧 Falta correo");
 
       await pullStockFromCloud();
-      accountsStock.push({ id: "acc_" + Date.now(), prodId, email, pass, profile, customId, codeUrl, used: false });
+      accountsStock.push({ id: "acc_" + Date.now() + "_" + Math.floor(Math.random() * 999), prodId, email, pass, profile, customId, codeUrl, used: false });
       await saveStockState();
 
       document.getElementById("stk-email").value = "";
@@ -2296,6 +2565,7 @@
     }
 
     async function adminDeleteStock(id) {
+      await pullStockFromCloud();
       accountsStock = accountsStock.filter(a => a.id !== id);
       await saveStockState();
       renderAll();
@@ -2304,12 +2574,29 @@
 
     function toggleManualStockInput() { document.getElementById("manual-stock-wrap").style.display = document.getElementById("p-auto-delivery").checked ? "none" : "block"; }
 
-    function adminSaveProduct() {
+    function clearProductForm() {
+      window.prodImgData = "";
+      document.getElementById("edit-prod-id").value = "";
+      document.getElementById("p-name").value = "";
+      document.getElementById("p-price").value = "";
+      document.getElementById("p-desc").value = "";
+      document.getElementById("p-warranty").value = "";
+      document.getElementById("p-post-buy-msg").value = "";
+      document.getElementById("p-tags").value = "";
+      document.getElementById("p-ask-email").checked = false;
+      document.getElementById("p-ask-pass").checked = false;
+      document.getElementById("p-ask-id").checked = false;
+      const prev = document.getElementById("p-img-preview");
+      if (prev) { prev.src = ""; prev.style.display = "none"; }
+    }
+
+    async function adminSaveProduct() {
       const editId = document.getElementById("edit-prod-id").value;
       const name = document.getElementById("p-name").value.trim();
       const price = Number(document.getElementById("p-price").value);
       if (!name || isNaN(price)) return showPurpleToast("📦 Datos incompletos");
 
+      await pullStateFromCloud(true);
       const existingProd = editId ? STATE.products.find(x => x.id === editId) : null;
       const rawTags = document.getElementById("p-tags").value.split(",").map(t => t.trim()).filter(Boolean);
 
@@ -2338,12 +2625,9 @@
         STATE.products.push(prodObj);
       }
 
-      window.prodImgData = "";
-      document.getElementById("edit-prod-id").value = "";
-      const prev = document.getElementById("p-img-preview");
-      if (prev) { prev.src = ""; prev.style.display = "none"; }
-
-      saveState(); showPurpleToast("✨ Se guardó con éxito");
+      clearProductForm();
+      await saveState();
+      showPurpleToast("✨ Se guardó con éxito");
     }
 
     function adminLoadProductToEdit(id) {
@@ -2372,13 +2656,19 @@
       showPurpleToast("✏️ Producto cargado para editar");
     }
 
-    function adminDeleteProduct(id) { STATE.products = STATE.products.filter(p => p.id !== id); saveState(); showPurpleToast("✨ Eliminado"); }
+    async function adminDeleteProduct(id) {
+      await pullStateFromCloud(true);
+      STATE.products = STATE.products.filter(p => p.id !== id);
+      await saveState();
+      showPurpleToast("✨ Eliminado");
+    }
 
-    function adminSaveCategory() {
+    async function adminSaveCategory() {
       const editId = document.getElementById("edit-cat-id").value;
       const name = document.getElementById("cat-name-input").value.trim();
       const icon = document.getElementById("cat-icon-input").value.trim() || "📁";
       if (!name) return showPurpleToast("⚠️ Ingresa nombre de categoría");
+      await pullStateFromCloud(true);
       const existingCat = editId ? STATE.categories.find(c => c.id === editId) : null;
       const catObj = { id: editId || ("cat_" + Date.now()), name, icon, img: window.catImgData || (existingCat ? existingCat.img : "") };
       if (editId) {
@@ -2391,7 +2681,10 @@
       document.getElementById("edit-cat-id").value = "";
       document.getElementById("cat-name-input").value = "";
       document.getElementById("cat-icon-input").value = "";
-      saveState(); showPurpleToast("✨ Categoría guardada");
+      const prev = document.getElementById("cat-img-preview");
+      if (prev) { prev.src = ""; prev.style.display = "none"; }
+      await saveState();
+      showPurpleToast("✨ Categoría guardada");
     }
 
     function adminLoadCategoryToEdit(id) {
@@ -2404,12 +2697,15 @@
       showPurpleToast("✏️ Categoría cargada para editar");
     }
 
-    function adminDeleteCategory(id) {
+    async function adminDeleteCategory(id) {
+      await pullStateFromCloud(true);
       STATE.categories = STATE.categories.filter(c => c.id !== id);
-      saveState(); showPurpleToast("✨ Categoría eliminada");
+      await saveState();
+      showPurpleToast("✨ Categoría eliminada");
     }
 
-    function adminSaveDesign() {
+    async function adminSaveDesign() {
+      await pullStateFromCloud(true);
       STATE.colors = Object.assign({}, STATE.colors, {
         purpleAccent: document.getElementById("cfg-color-purple").value || STATE.colors.purpleAccent,
         accent: document.getElementById("cfg-color-accent").value || STATE.colors.accent,
@@ -2438,24 +2734,29 @@
         STATE.background.dataUrl = imgUrl;
         STATE.background.videoId = "";
       }
-      saveState(); showPurpleToast("✨ Diseño guardado");
+      await saveState();
+      showPurpleToast("✨ Diseño guardado");
     }
 
-    function adminAddSong() {
+    async function adminAddSong() {
       const title = document.getElementById("song-title-input").value.trim();
       const url = document.getElementById("song-url-input").value.trim();
       if (!title || !url || url === "TU_URL_MP3_1") return showPurpleToast("⚠️ Ingresa título y URL válida");
+      await pullStateFromCloud(true);
       if (!Array.isArray(STATE.songs)) STATE.songs = [];
       STATE.songs.push({ title, url });
       document.getElementById("song-title-input").value = "";
       document.getElementById("song-url-input").value = "";
-      saveState(); showPurpleToast("✨ Canción agregada");
+      await saveState();
+      showPurpleToast("✨ Canción agregada");
     }
 
-    function adminDeleteSong(idx) {
+    async function adminDeleteSong(idx) {
+      await pullStateFromCloud(true);
       if (!Array.isArray(STATE.songs)) return;
       STATE.songs.splice(idx, 1);
-      saveState(); showPurpleToast("✨ Canción eliminada");
+      await saveState();
+      showPurpleToast("✨ Canción eliminada");
     }
 
     let isMusicPlaying = false;
@@ -2496,12 +2797,12 @@
 
     generateNewRefCode();
     renderAll();
-    pullStateFromCloud();
+    pullStateFromCloud(true);
     pullStockFromCloud();
     setInterval(() => {
-      pullStateFromCloud();
+      pullStateFromCloud(false);
       pullStockFromCloud();
-    }, 4000);
+    }, 3500);
   </script>
 </body>
 </html>
