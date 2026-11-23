@@ -820,6 +820,10 @@
           </div>
           <div class="field-group"><label>Tienda</label><input type="text" id="cfg-store-name" /></div>
           <div class="field-group"><label>Eslogan</label><input type="text" id="cfg-store-slogan" /></div>
+          <div class="field-group">
+            <label>Datos Bancarios / SPEI para Recargas</label>
+            <textarea id="cfg-bank-info" rows="3" placeholder="Ej. Banco: BBVA / SPEI&#10;CLABE: 012345678901234567"></textarea>
+          </div>
           <div class="field-group"><label>WhatsApp Admin</label><input type="text" id="cfg-wa-number" placeholder="TU_NUMERO_WHATSAPP" /></div>
           <div class="field-group"><label>Telegram Bot Token</label><input type="text" id="cfg-tg-token" placeholder="TU_TELEGRAM_BOT_TOKEN" /></div>
           <div class="field-group"><label>Telegram Chat ID</label><input type="text" id="cfg-tg-chat-id" placeholder="TU_TELEGRAM_CHAT_ID" /></div>
@@ -1875,6 +1879,7 @@
 
       document.getElementById("cfg-store-name").value = STATE.storeName || "";
       document.getElementById("cfg-store-slogan").value = STATE.storeSlogan || "";
+      document.getElementById("cfg-bank-info").value = STATE.bankInfo || "";
       document.getElementById("cfg-wa-number").value = STATE.waNumber || "";
       document.getElementById("cfg-tg-token").value = STATE.tgToken || "";
       document.getElementById("cfg-tg-chat-id").value = STATE.tgChatId || "";
@@ -2144,6 +2149,7 @@
     function adminSaveDesign() {
       STATE.storeName = document.getElementById("cfg-store-name").value.trim() || STATE.storeName;
       STATE.storeSlogan = document.getElementById("cfg-store-slogan").value.trim() || STATE.storeSlogan;
+      STATE.bankInfo = document.getElementById("cfg-bank-info").value.trim() || STATE.bankInfo;
       STATE.waNumber = document.getElementById("cfg-wa-number").value.trim();
       STATE.tgToken = document.getElementById("cfg-tg-token").value.trim();
       STATE.tgChatId = document.getElementById("cfg-tg-chat-id").value.trim();
