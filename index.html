@@ -979,7 +979,7 @@
 
         <div id="adm-export" class="adm-tab" style="display:none;">
           <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px;line-height:1.45;">
-            Usa este botón para subir a la nube todo lo que ya editaste en este dispositivo y que aparezca en incógnito y a todos los clientes:
+            Sube a la nube todo lo que ya editaste en este dispositivo para que aparezca en incógnito y a todos los clientes:
           </p>
           <button class="btn-main" onclick="forcePushToCloud()">☁️ Subir mi tienda actual a la nube</button>
           <div id="cloud-diag-box" style="margin-top:10px;font-size:11.5px;color:#cbd5e1;background:rgba(255,255,255,0.04);padding:10px;border-radius:10px;word-break:break-all;"></div>
@@ -1196,12 +1196,8 @@
       document.body.removeChild(ta);
     }
 
-    // CONEXIÓN A TU CLOUDFLARE WORKER (KV)
+    // CONEXIÓN DIRECTA A TU CLOUDFLARE WORKER (KV)
     const WORKER_BASE = "https://cocobongo.dessireecampos07.workers.dev";
-    const CLOUD_DB_URL = `${WORKER_BASE}?key=store_v1`;
-    const CLOUD_VIDEO_URL = `${WORKER_BASE}?key=store_video_bg`;
-    const CLOUD_STOCK_URL = `${WORKER_BASE}?key=store_stock_v1`;
-
     const STORAGE_KEY = "COCOBONGOSTORE_CLOUD_CACHE_V1";
     const STOCK_STORAGE_KEY = "COCOBONGOSTORE_STOCK_CACHE_V1";
     const CLIENT_ID_KEY = "COCOBONGOSTORE_CLIENT_DEVICE_ID";
@@ -1235,6 +1231,23 @@
       }
     }
 
+    function unwrapCloudPayload(parsed) {
+      if (!parsed || typeof parsed !== "object") return parsed;
+      if (parsed.value !== undefined) {
+        if (typeof parsed.value === "string") {
+          try { return JSON.parse(parsed.value); } catch (e) { return parsed.value; }
+        }
+        return parsed.value;
+      }
+      if (parsed.data !== undefined && parsed.ok === true) {
+        if (typeof parsed.data === "string") {
+          try { return JSON.parse(parsed.data); } catch (e) { return parsed.data; }
+        }
+        return parsed.data;
+      }
+      return parsed;
+    }
+
     async function cloudGet(key) {
       const urls = [
         `${WORKER_BASE}?key=${encodeURIComponent(key)}&t=${Date.now()}`,
@@ -1247,7 +1260,8 @@
             const text = await res.text();
             if (!text || text === "null") return { ok: true, data: null };
             try {
-              return { ok: true, data: JSON.parse(text) };
+              const parsed = JSON.parse(text);
+              return { ok: true, data: unwrapCloudPayload(parsed) };
             } catch (e) {
               return { ok: true, data: null };
             }
@@ -1259,24 +1273,26 @@
 
     async function cloudPut(key, payload) {
       const bodyStr = JSON.stringify(payload);
-      const endpoints = [
-        `${WORKER_BASE}?key=${encodeURIComponent(key)}`,
-        `${WORKER_BASE}/${encodeURIComponent(key)}`
+      const attempts = [
+        { url: `${WORKER_BASE}?key=${encodeURIComponent(key)}`, method: "PUT", headers: { "Content-Type": "application/json" }, body: bodyStr },
+        { url: `${WORKER_BASE}/${encodeURIComponent(key)}`, method: "PUT", headers: { "Content-Type": "application/json" }, body: bodyStr },
+        { url: `${WORKER_BASE}?key=${encodeURIComponent(key)}`, method: "POST", headers: { "Content-Type": "application/json" }, body: bodyStr },
+        { url: WORKER_BASE, method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, value: payload }) }
       ];
-      let lastErr = "Error de red o CORS en PUT";
-      for (const url of endpoints) {
+      let lastErr = "Error de red o CORS";
+      for (const reqCfg of attempts) {
         try {
-          const res = await fetch(url, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: bodyStr
+          const res = await fetch(reqCfg.url, {
+            method: reqCfg.method,
+            headers: reqCfg.headers,
+            body: reqCfg.body
           });
           if (res.ok) {
             return { ok: true };
           }
           lastErr = `HTTP ${res.status}`;
         } catch (err) {
-          lastErr = err && err.message ? err.message : "Fallo fetch PUT (posible CORS)";
+          lastErr = err && err.message ? err.message : "Fallo fetch (revisa CORS en el Worker)";
         }
       }
       return { ok: false, error: lastErr };
@@ -1296,7 +1312,6 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
       compressImageFile(file, 1080, 0.85, true, async function(dataUrl) {
-        await pullStateFromCloud(false);
         STATE.background.type = "image";
         STATE.background.dataUrl = dataUrl;
         STATE.background.videoId = "";
